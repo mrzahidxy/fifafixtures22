@@ -15,8 +15,16 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import styles from "../styles/Home.module.css";
 
 const teams = ({ fixtures }) => {
-  const [selectedCountry, setSelectedCountry] = useState("brazil");
+  const [selectedCountry, setSelectedCountry] = useState("Brazil");
   const countries = fixtures.map(({ HomeTeam }) => HomeTeam);
+
+  const uniqueCountries = countries.filter(function onlyUnique(
+    value,
+    index,
+    self
+  ) {
+    return self.indexOf(value) === index;
+  });
   const selectedCountryGame = fixtures.filter(
     ({ HomeTeam, AwayTeam }) =>
       HomeTeam.toLowerCase() == selectedCountry.toLocaleLowerCase() ||
@@ -65,11 +73,11 @@ const teams = ({ fixtures }) => {
                 label="Country"
                 onChange={(e) => setSelectedCountry(e.target.value)}
               >
-                {countries
-                  .slice(0, 31)
+                {uniqueCountries
+                  .slice(0, 32)
                   .sort()
-                  .map((country) => (
-                    <MenuItem sx={{ minWidth: "300px" }} value={country}>
+                  .map((country, index) => (
+                    <MenuItem key={index} sx={{ minWidth: "300px" }} value={country}>
                       {country}
                     </MenuItem>
                   ))}
@@ -86,8 +94,8 @@ const teams = ({ fixtures }) => {
             }}
           >
             {selectedCountryGame?.map(
-              ({ DateUtc, Location, HomeTeam, AwayTeam, Group }) => (
-                <Card>
+              ({ DateUtc, HomeTeam, AwayTeam, Group }, index) => (
+                <Card key={index}>
                   <CardContent>
                     <Typography> {Group}</Typography>
                     <Typography
@@ -132,7 +140,15 @@ const teams = ({ fixtures }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by Zahid Hasan
+          Powered by{" "}
+          <span
+            style={{
+              color: "#56042c",
+              fontWeight: "600",
+            }}
+          >
+            Zahid Hasan
+          </span>
         </a>
       </footer>
     </>
