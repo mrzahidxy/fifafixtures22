@@ -8,12 +8,18 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import SEO from "../components/SEO";
 import styles from "../styles/Home.module.css";
 import { getWorldCupStandings } from "../lib/footballData";
 
 const Standings = ({ standings }) => {
   return (
     <>
+      <SEO
+        title="World Cup Standings — World Cup Hub"
+        description="Follow World Cup group standings with points, wins, draws, losses, goals, and goal difference."
+      />
+
       <main className="page-shell">
         <header
           className="page-header image-banner"
@@ -83,7 +89,7 @@ const Standings = ({ standings }) => {
                           {row.teamCrest && (
                             <Avatar
                               src={row.teamCrest}
-                              alt={row.teamName || "TBD"}
+                              alt={`${row.teamName || "Team"} crest`}
                               sx={{
                                 width: 26,
                                 height: 26,
@@ -121,7 +127,7 @@ const Standings = ({ standings }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by <span>Zahid Hasan</span>
+          Built by <span>Zahid Hasan</span> with football-data.org
         </a>
       </footer>
     </>

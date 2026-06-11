@@ -1,17 +1,18 @@
-# FIFA22 Fixtures
+# World Cup Hub
 
-A Next.js app for browsing FIFA World Cup matches, fixtures, teams, standings, scorers, and match results.
+A responsive World Cup dashboard built with Next.js and football-data.org.
 
 ## Features
 
-- Home page with live matches, upcoming matches, and recent results.
-- Full fixtures table with kickoff time, result status, and simple filters.
-- Team page with official teams and team-wise fixtures.
-- Standings page with World Cup group tables.
-- Scorers page with World Cup top scorers.
+- Fixtures and results.
+- Live, upcoming, and recent match sections.
+- Teams and team details.
+- Squad/player table.
+- Group standings.
+- Top scorers.
 - Shared navigation with route progress loading.
 - Match, team, standings, and scorer data loaded from football-data.org.
-- Dark World Cup dashboard UI with burgundy and gold accents.
+- Responsive dark dashboard UI.
 
 ## Available Pages
 

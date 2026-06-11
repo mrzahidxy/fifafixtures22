@@ -8,12 +8,18 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import SEO from "../components/SEO";
 import styles from "../styles/Home.module.css";
 import { getWorldCupScorers } from "../lib/footballData";
 
 const Scorers = ({ scorers }) => {
   return (
     <>
+      <SEO
+        title="World Cup Top Scorers — World Cup Hub"
+        description="Track the leading World Cup goal scorers, teams, nationalities, assists, and penalties."
+      />
+
       <main className="page-shell">
         <header
           className="page-header image-banner"
@@ -68,7 +74,7 @@ const Scorers = ({ scorers }) => {
                         {scorer.teamCrest && (
                           <Avatar
                             src={scorer.teamCrest}
-                            alt={scorer.teamName || "TBD"}
+                            alt={`${scorer.teamName || "Team"} crest`}
                             sx={{
                               width: 26,
                               height: 26,
@@ -99,7 +105,7 @@ const Scorers = ({ scorers }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by <span>Zahid Hasan</span>
+          Built by <span>Zahid Hasan</span> with football-data.org
         </a>
       </footer>
     </>

@@ -15,6 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import SEO from "../components/SEO";
 import styles from "../styles/Home.module.css";
 import {
   getTeamDetails,
@@ -73,7 +74,13 @@ function TeamMatchCard({ match }) {
   );
 }
 
-const Teams = ({ teams, fixtures, teamDetails, selectedTeamId }) => {
+const Teams = ({
+  teams,
+  fixtures,
+  teamDetails,
+  selectedTeamId,
+  hasSelectedTeamQuery,
+}) => {
   const router = useRouter();
   const selectedTeam =
     teamDetails ||
@@ -89,6 +96,14 @@ const Teams = ({ teams, fixtures, teamDetails, selectedTeamId }) => {
         awayTeam === selectedTeam.shortName)
   );
   const squad = teamDetails?.squad || [];
+  const seoTitle =
+    hasSelectedTeamQuery && selectedTeam?.name
+      ? `${selectedTeam.name} Team Details & Squad — World Cup Hub`
+      : "World Cup Teams — World Cup Hub";
+  const seoDescription =
+    hasSelectedTeamQuery && selectedTeam?.name
+      ? `View ${selectedTeam.name} team details, coach information, squad players, and World Cup matches.`
+      : "Explore World Cup teams, team profiles, crests, and team-wise fixtures.";
 
   const handleTeamChange = (event) => {
     router.push(`/teams?team=${event.target.value}`);
@@ -96,6 +111,8 @@ const Teams = ({ teams, fixtures, teamDetails, selectedTeamId }) => {
 
   return (
     <>
+      <SEO title={seoTitle} description={seoDescription} />
+
       <main className="page-shell">
         <header
           className="page-header image-banner"
@@ -120,7 +137,7 @@ const Teams = ({ teams, fixtures, teamDetails, selectedTeamId }) => {
               {selectedTeam.crest && (
                 <Avatar
                   src={selectedTeam.crest}
-                  alt={selectedTeam.name || "TBD"}
+                  alt={`${selectedTeam.name || "Selected team"} crest`}
                   sx={{
                     width: 42,
                     height: 42,
@@ -150,7 +167,7 @@ const Teams = ({ teams, fixtures, teamDetails, selectedTeamId }) => {
                     {team.crest && (
                       <Avatar
                         src={team.crest}
-                        alt={team.name || "TBD"}
+                        alt={`${team.name || "Team"} crest`}
                         sx={{
                           width: 24,
                           height: 24,
@@ -174,7 +191,7 @@ const Teams = ({ teams, fixtures, teamDetails, selectedTeamId }) => {
               {teamDetails.crest && (
                 <Avatar
                   src={teamDetails.crest}
-                  alt={teamDetails.name}
+                  alt={`${teamDetails.name || "Team"} crest`}
                   className="team-detail-crest"
                   sx={{ background: "rgba(232, 237, 245, 0.9)" }}
                 />
@@ -284,7 +301,7 @@ const Teams = ({ teams, fixtures, teamDetails, selectedTeamId }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by <span>Zahid Hasan</span>
+          Built by <span>Zahid Hasan</span> with football-data.org
         </a>
       </footer>
     </>
@@ -311,13 +328,25 @@ export async function getServerSideProps({ query }) {
     }
 
     return {
-      props: { teams, fixtures, teamDetails, selectedTeamId },
+      props: {
+        teams,
+        fixtures,
+        teamDetails,
+        selectedTeamId,
+        hasSelectedTeamQuery: Boolean(query.team),
+      },
     };
   } catch (error) {
     console.error(error);
 
     return {
-      props: { teams: [], fixtures: [], teamDetails: null, selectedTeamId: "" },
+      props: {
+        teams: [],
+        fixtures: [],
+        teamDetails: null,
+        selectedTeamId: "",
+        hasSelectedTeamQuery: Boolean(query.team),
+      },
     };
   }
 }

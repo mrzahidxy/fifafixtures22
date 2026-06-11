@@ -13,6 +13,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import SEO from "../components/SEO";
 import styles from "../styles/Home.module.css";
 import { getWorldCupMatches } from "../lib/footballData";
 import {
@@ -62,6 +63,11 @@ const Fixtures = ({ fixtures }) => {
 
   return (
     <>
+      <SEO
+        title="World Cup Fixtures & Results — World Cup Hub"
+        description="Browse World Cup fixtures and results by match status and tournament stage."
+      />
+
       <main className="page-shell">
         <header
           className="page-header image-banner"
@@ -158,7 +164,7 @@ const Fixtures = ({ fixtures }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by <span>Zahid Hasan</span>
+          Built by <span>Zahid Hasan</span> with football-data.org
         </a>
       </footer>
     </>

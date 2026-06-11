@@ -5,8 +5,8 @@ import {
   Chip,
   Typography,
 } from "@mui/material";
-import Head from "next/head";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import SEO from "../components/SEO";
 import styles from "../styles/Home.module.css";
 import { getWorldCupMatches } from "../lib/footballData";
 import {
@@ -116,14 +116,10 @@ export default function Home({ fixtures }) {
 
   return (
     <>
-      <Head>
-        <title>World Cup Hub</title>
-        <meta
-          name="description"
-          content="World Cup fixtures, results, standings, and scorers"
-        />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+      <SEO
+        title="World Cup Hub — Fixtures, Results, Teams & Standings"
+        description="Track World Cup fixtures, live match status, recent results, teams, standings, and top scorers in one clean football dashboard."
+      />
 
       <main className="page-shell">
         <section
@@ -131,7 +127,7 @@ export default function Home({ fixtures }) {
           style={{ "--banner-image": "url('/assets/fifa.jpg')" }}
         >
           <span className="eyebrow">Football-data.org dashboard</span>
-          <h1 className="page-title">World Cup 2026 Fixtures & Results</h1>
+          <h1 className="page-title">World Cup Hub</h1>
           <p className="page-subtitle">
             Track live matches, upcoming fixtures, recent results, standings,
             and top scorers.
@@ -180,7 +176,7 @@ export default function Home({ fixtures }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by <span>Zahid Hasan</span>
+          Built by <span>Zahid Hasan</span> with football-data.org
         </a>
       </footer>
     </>
