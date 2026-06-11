@@ -132,6 +132,17 @@ img {
     linear-gradient(0deg, rgba(11, 16, 32, 0.46), transparent 52%);
 }
 
+.image-banner .page-title,
+.image-banner .page-subtitle,
+.image-banner .eyebrow {
+  color: #F8FAFC;
+  text-shadow: 0 2px 14px rgba(4, 9, 20, 0.46);
+}
+
+.image-banner .page-subtitle {
+  color: rgba(248, 250, 252, 0.86);
+}
+
 .page-title {
   margin: 0;
   color: var(--color-text);
@@ -164,7 +175,7 @@ img {
 }
 
 .match-grid {
-  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .stats-grid {
@@ -582,6 +593,10 @@ img {
 @media (max-width: 900px) {
   .page-shell {
     padding: 20px;
+  }
+
+  .match-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .page-header,
