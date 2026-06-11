@@ -2,164 +2,176 @@ import {
   Box,
   Card,
   CardContent,
-  CardMedia,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  Chip,
   Typography,
 } from "@mui/material";
 import Head from "next/head";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import styles from "../styles/Home.module.css";
-import moment from "moment/moment";
+import { getWorldCupMatches } from "../lib/footballData";
+import {
+  formatMatchDateTime,
+  formatMatchScore,
+  formatMatchStage,
+  formatMatchStatus,
+} from "../lib/formatters";
 
-export default function Home({ fixtures }) {
-  //today's game
-  const TodaysGame = () => {
-    const todyasGame = fixtures.filter(
-      (fixture) =>
-        new Date(fixture.DateUtc)
-          .toLocaleDateString("en-BD")
-          .split("/")
-          .join("") ==
-        new Date().toLocaleDateString("en-BD").split("/").join("")
-    );
-
-    // console.log(todyasGame.length);
-    return (
-      <Box sx={{ margin: "15px 10px" }}>
-        <Typography
-          variant="h6"
-          style={{ textAlign: "center" }}
-          className="title"
-        >
-          {moment(new Date()).format("dddd, MMM Do Y")}
-        </Typography>
-
-        <Box
-          className="fix-container"
-          sx={{
-            display: "flex",
-            gap: "10px",
-            justifyContent: "center",
-          }}
-        >
-          {todyasGame.length === 0 ? (
-            <Card
-              sx={{
-                padding: "30px",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "red",
-              }}
-            >
-              No Match Today
-            </Card>
-          ) : (
-            todyasGame.map(({ DateUtc, HomeTeam, AwayTeam, Group }, index) => (
-              <Card key={index}>
-                <CardContent>
-                  <Typography> {Group}</Typography>
-                  <Typography
-                    sx={{ color: "#56042C" }}
-                    className="match-title"
-                    component="div"
-                    variant="h5"
-                  >
-                    {HomeTeam} VS {AwayTeam}
-                  </Typography>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "3px",
-                    }}
-                  >
-                    <AccessTimeIcon sx={{ color: "#FEC310" }} />
-                    <Typography
-                      sx={{ color: "#1077C3" }}
-                      variant="subtitle1"
-                      color="text.primary"
-                      component="div"
-                    >
-                      {moment(new Date(DateUtc)).format(
-                        "dddd, MMM Do Y, h:mm A"
-                      )}
-                    </Typography>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </Box>
-      </Box>
-    );
-  };
-
-  const FullFixtures = () => {
-    return (
-      <TableContainer component={Paper}>
-        <Table aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Match</TableCell>
-              <TableCell>Date & Time</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {fixtures?.map(
-              ({
-                DateUtc,
-
-                HomeTeam,
-                AwayTeam,
-              }) => (
-                <TableRow
-                  // key={row.name}
-                  sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                >
-                  <TableCell>
-                    {HomeTeam} VS {AwayTeam}
-                  </TableCell>
-                  <TableCell>
-                    {moment(new Date(DateUtc)).format("dddd, MMM Do Y, h:mm A")}
-                  </TableCell>
-                </TableRow>
-              )
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  };
+function StatusChip({ status }) {
+  const label = formatMatchStatus(status);
+  const color =
+    label === "Live"
+      ? "var(--color-success)"
+      : label === "Finished"
+      ? "var(--color-gold)"
+      : "var(--color-info)";
 
   return (
-    <div stylet={{display:"flex", justifyContent: "space-between", alignItems: "space-between"}}>
+    <Chip
+      size="small"
+      label={label}
+      sx={{
+        color,
+        borderColor: color,
+        background: "rgba(232, 237, 245, 0.05)",
+        fontWeight: 700,
+      }}
+      variant="outlined"
+    />
+  );
+}
+
+function MatchCard({ match }) {
+  return (
+    <article className="match-card">
+      <span className="eyebrow">
+        {formatMatchStage(match.group || match.stage)}
+      </span>
+      <h3 className="match-title">
+        {match.homeTeam || "TBD"} VS {match.awayTeam || "TBD"}
+      </h3>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          flexWrap: "wrap",
+        }}
+      >
+        <StatusChip status={match.status} />
+        <Typography className="score-text">
+          {formatMatchScore(match.homeScore, match.awayScore)}
+        </Typography>
+      </Box>
+      <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <AccessTimeIcon sx={{ color: "var(--color-gold)", fontSize: 18 }} />
+        <Typography className="muted-text">
+          {formatMatchDateTime(match.utcDate)}
+        </Typography>
+      </Box>
+    </article>
+  );
+}
+
+function MatchSection({ title, matches, emptyMessage }) {
+  return (
+    <section>
+      <h2 className="section-title">{title}</h2>
+      {matches.length === 0 ? (
+        <div className="empty-state">
+          <strong>{emptyMessage}</strong>
+          Match information will appear here when available.
+        </div>
+      ) : (
+        <div className="match-grid">
+          {matches.map((match) => (
+            <MatchCard key={match.id} match={match} />
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
+
+export default function Home({ fixtures }) {
+  const liveMatches = fixtures.filter((fixture) =>
+    ["LIVE", "IN_PLAY", "PAUSED"].includes(fixture.status)
+  );
+  const upcomingMatches = fixtures
+    .filter((fixture) => fixture.status === "SCHEDULED")
+    .sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate))
+    .slice(0, 5);
+  const recentResults = fixtures
+    .filter((fixture) => fixture.status === "FINISHED")
+    .sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
+    .slice(0, 5);
+  const statCards = [
+    { label: "Total Matches", value: fixtures.length },
+    { label: "Live", value: liveMatches.length },
+    { label: "Upcoming", value: upcomingMatches.length },
+    {
+      label: "Finished",
+      value: fixtures.filter((fixture) => fixture.status === "FINISHED").length,
+    },
+  ];
+
+  return (
+    <>
       <Head>
-        <title>FIFA22 Fixtures</title>
-        <meta name="description" content="Generated by create next app" />
+        <title>World Cup Hub</title>
+        <meta
+          name="description"
+          content="World Cup fixtures, results, standings, and scorers"
+        />
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main>
-        <Card>
-          <CardMedia
-            component="img"
-            height="300"
-            image="../assets/fifa2022.jpg"
-            alt="fifa2022"
-            sx={{
-              objectFit: "cover",
-            }}
-          />
-        </Card>
+      <main className="page-shell">
+        <section
+          className="hero-card image-banner"
+          style={{ "--banner-image": "url('/assets/fifa.jpg')" }}
+        >
+          <span className="eyebrow">Football-data.org dashboard</span>
+          <h1 className="page-title">World Cup 2026 Fixtures & Results</h1>
+          <p className="page-subtitle">
+            Track live matches, upcoming fixtures, recent results, standings,
+            and top scorers.
+          </p>
 
-        <TodaysGame />
+          <div className="stats-grid">
+            {statCards.map((stat) => (
+              <Card className="card stat-card" key={stat.label}>
+                <CardContent sx={{ padding: 0, "&:last-child": { paddingBottom: 0 } }}>
+                  <Typography className="muted-text">{stat.label}</Typography>
+                  <Typography
+                    sx={{
+                      color: "var(--color-text)",
+                      fontSize: "2rem",
+                      fontWeight: 900,
+                    }}
+                  >
+                    {stat.value}
+                  </Typography>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        <MatchSection
+          title="Live Matches"
+          matches={liveMatches}
+          emptyMessage="No live matches right now."
+        />
+        <MatchSection
+          title="Upcoming Matches"
+          matches={upcomingMatches}
+          emptyMessage="No upcoming matches right now."
+        />
+        <MatchSection
+          title="Recent Results"
+          matches={recentResults}
+          emptyMessage="No recent results yet."
+        />
       </main>
 
       <footer className={styles.footer}>
@@ -168,27 +180,25 @@ export default function Home({ fixtures }) {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{" "}
-          <span
-            style={{
-              color: "#56042c",
-              fontWeight: "600",
-            }}
-          >
-            Zahid Hasan
-          </span>
+          Powered by <span>Zahid Hasan</span>
         </a>
       </footer>
-    </div>
+    </>
   );
 }
 
 export async function getServerSideProps() {
-  const data = await fetch(
-    "https://fixturedownload.com/feed/json/fifa-world-cup-2022"
-  ).then((res) => res.json());
+  try {
+    const fixtures = await getWorldCupMatches();
 
-  return {
-    props: { fixtures: data },
-  };
+    return {
+      props: { fixtures },
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      props: { fixtures: [] },
+    };
+  }
 }

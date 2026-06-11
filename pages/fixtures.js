@@ -1,77 +1,155 @@
-import React from "react";
+import { useState } from "react";
 import {
-  Paper,
+  Box,
+  Chip,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Table,
   TableBody,
   TableCell,
-  TableContainer,
   TableHead,
   TableRow,
   Typography,
 } from "@mui/material";
-import moment from "moment/moment";
-import { Box } from "@mui/system";
 import styles from "../styles/Home.module.css";
+import { getWorldCupMatches } from "../lib/footballData";
+import {
+  formatMatchDateTime,
+  formatMatchScore,
+  formatMatchStage,
+  formatMatchStatus,
+} from "../lib/formatters";
 
-const fixtures = ({ fixtures }) => {
+function StatusChip({ status }) {
+  return (
+    <Chip
+      size="small"
+      label={formatMatchStatus(status)}
+      sx={{
+        color: "var(--color-gold)",
+        borderColor: "var(--color-gold)",
+        fontWeight: 700,
+      }}
+      variant="outlined"
+    />
+  );
+}
+
+const Fixtures = ({ fixtures }) => {
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [stageFilter, setStageFilter] = useState("All");
+  const statusOptions = [
+    "All",
+    "SCHEDULED",
+    "LIVE",
+    "IN_PLAY",
+    "PAUSED",
+    "FINISHED",
+  ];
+  const stageOptions = [
+    "All",
+    ...new Set(fixtures.map((fixture) => fixture.stage).filter(Boolean)),
+  ];
+  const filteredFixtures = fixtures.filter((fixture) => {
+    const matchesStatus =
+      statusFilter === "All" || fixture.status === statusFilter;
+    const matchesStage = stageFilter === "All" || fixture.stage === stageFilter;
+
+    return matchesStatus && matchesStage;
+  });
+
   return (
     <>
-      <main>
-        <Box sx={{ margin: "15px 10px" }}>
-          <Typography
-            variant="h6"
-            style={{ textAlign: "center" }}
-            className="title"
-          >
-            FULL FIXTURES
-          </Typography>
+      <main className="page-shell">
+        <header
+          className="page-header image-banner"
+          style={{ "--banner-image": "url('/assets/fifa.jpg')" }}
+        >
+          <h1 className="page-title">Fixtures</h1>
+          <p className="page-subtitle">
+            Browse every World Cup match by status and stage.
+          </p>
+        </header>
 
-          <TableContainer component={Paper}>
-            <Table aria-label="simple table">
+        <section className="filter-bar">
+          <FormControl sx={{ minWidth: 180 }}>
+            <InputLabel>Status</InputLabel>
+            <Select
+              value={statusFilter}
+              label="Status"
+              onChange={(e) => setStatusFilter(e.target.value)}
+            >
+              {statusOptions.map((status) => (
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl sx={{ minWidth: 180 }}>
+            <InputLabel>Stage</InputLabel>
+            <Select
+              value={stageFilter}
+              label="Stage"
+              onChange={(e) => setStageFilter(e.target.value)}
+            >
+              {stageOptions.map((stage) => (
+                <MenuItem key={stage} value={stage}>
+                  {stage}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </section>
+
+        {filteredFixtures.length === 0 ? (
+          <div className="empty-state">
+            <strong>No matches found for the selected filters.</strong>
+            Try a different status or stage.
+          </div>
+        ) : (
+          <Box className="table-card">
+            <Table className="dark-table" aria-label="fixtures table">
               <TableHead>
                 <TableRow>
                   <TableCell>Match</TableCell>
+                  <TableCell>Stage/Group</TableCell>
                   <TableCell>Date & Time</TableCell>
+                  <TableCell>Status</TableCell>
                   <TableCell>Result</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {fixtures?.map(
-                  ({
-                    DateUtc,
-                    HomeTeam,
-                    AwayTeam,
-                    HomeTeamScore,
-                    AwayTeamScore,
-                  }, index) => (
-                    <TableRow key={index}
-                      // key={row.name}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      <TableCell>
-                        {HomeTeam} VS {AwayTeam}
-                      </TableCell>
-                      <TableCell>
-                        {moment(new Date(DateUtc)).format(
-                          "dddd, MMM Do Y, h:mm A"
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {HomeTeamScore == null || AwayTeamScore == null ? (
-                          "No Result Yet"
-                        ) : (
-                          <>
-                            {HomeTeamScore} VS {AwayTeamScore}
-                          </>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  )
-                )}
+                {filteredFixtures.map((fixture) => (
+                  <TableRow
+                    key={fixture.id}
+                    sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                  >
+                    <TableCell>
+                      <Typography sx={{ fontWeight: 800 }}>
+                        {fixture.homeTeam || "TBD"} VS{" "}
+                        {fixture.awayTeam || "TBD"}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      {formatMatchStage(fixture.group || fixture.stage)}
+                    </TableCell>
+                    <TableCell>{formatMatchDateTime(fixture.utcDate)}</TableCell>
+                    <TableCell>
+                      <StatusChip status={fixture.status} />
+                    </TableCell>
+                    <TableCell className="score-text">
+                      {formatMatchScore(fixture.homeScore, fixture.awayScore)}
+                    </TableCell>
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
-          </TableContainer>
-        </Box>
+          </Box>
+        )}
       </main>
 
       <footer className={styles.footer}>
@@ -80,29 +158,27 @@ const fixtures = ({ fixtures }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{" "}
-          <span
-            style={{
-              color: "#56042c",
-              fontWeight: "600",
-            }}
-          >
-            Zahid Hasan
-          </span>
+          Powered by <span>Zahid Hasan</span>
         </a>
       </footer>
     </>
   );
 };
 
-export default fixtures;
+export default Fixtures;
 
 export async function getServerSideProps() {
-  const data = await fetch(
-    "https://fixturedownload.com/feed/json/fifa-world-cup-2022"
-  ).then((res) => res.json());
+  try {
+    const fixtures = await getWorldCupMatches();
 
-  return {
-    props: { fixtures: data },
-  };
+    return {
+      props: { fixtures },
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      props: { fixtures: [] },
+    };
+  }
 }

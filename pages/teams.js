@@ -1,137 +1,163 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
+  Avatar,
   Box,
-  Card,
-  CardContent,
-  CardMedia,
+  Chip,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
   Typography,
 } from "@mui/material";
-import moment from "moment/moment";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import styles from "../styles/Home.module.css";
+import { getWorldCupMatches, getWorldCupTeams } from "../lib/footballData";
+import {
+  formatMatchDateTime,
+  formatMatchScore,
+  formatMatchStage,
+  formatMatchStatus,
+} from "../lib/formatters";
 
-const teams = ({ fixtures }) => {
-  const [selectedCountry, setSelectedCountry] = useState("Brazil");
-  const countries = fixtures.map(({ HomeTeam }) => HomeTeam);
+function TeamMatchCard({ match }) {
+  return (
+    <article className="match-card">
+      <span className="eyebrow">
+        {formatMatchStage(match.group || match.stage)}
+      </span>
+      <h3 className="match-title">
+        {match.homeTeam || "TBD"} VS {match.awayTeam || "TBD"}
+      </h3>
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          flexWrap: "wrap",
+        }}
+      >
+        <Chip
+          size="small"
+          label={formatMatchStatus(match.status)}
+          sx={{
+            color: "var(--color-gold)",
+            borderColor: "var(--color-gold)",
+            fontWeight: 700,
+          }}
+          variant="outlined"
+        />
+        <Typography className="score-text">
+          {formatMatchScore(match.homeScore, match.awayScore)}
+        </Typography>
+      </Box>
+      <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+        <AccessTimeIcon sx={{ color: "var(--color-gold)", fontSize: 18 }} />
+        <Typography className="muted-text">
+          {formatMatchDateTime(match.utcDate)}
+        </Typography>
+      </Box>
+    </article>
+  );
+}
 
-  const uniqueCountries = countries.filter(function onlyUnique(
-    value,
-    index,
-    self
-  ) {
-    return self.indexOf(value) === index;
-  });
-  const selectedCountryGame = fixtures.filter(
-    ({ HomeTeam, AwayTeam }) =>
-      HomeTeam.toLowerCase() == selectedCountry.toLocaleLowerCase() ||
-      AwayTeam.toLowerCase() == selectedCountry.toLocaleLowerCase()
+const Teams = ({ teams, fixtures }) => {
+  const [selectedTeamId, setSelectedTeamId] = useState(teams[0]?.id || "");
+  const selectedTeam =
+    teams.find((team) => team.id === selectedTeamId) || teams[0] || null;
+  const selectedTeamGame = fixtures.filter(
+    ({ homeTeam, awayTeam }) =>
+      selectedTeam &&
+      (homeTeam === selectedTeam.name || awayTeam === selectedTeam.name)
   );
 
   return (
     <>
-      <main>
-        <Card>
-          <CardMedia
-            component="img"
-            height="300"
-            image="../assets/teams.jpg"
-            alt="fifa2022"
-            sx={{
-              objectFit: "cover",
-            }}
-          />
-        </Card>
+      <main className="page-shell">
+        <header
+          className="page-header image-banner"
+          style={{ "--banner-image": "url('/assets/fifa.jpg')" }}
+        >
+          <h1 className="page-title">Teams</h1>
+          <p className="page-subtitle">
+            Select a team to view its World Cup fixtures.
+          </p>
+        </header>
 
-        <Box sx={{ margin: "15px 10px" }}>
-          <Box
-            className="action-from"
-            sx={{
-              display: "flex",
-              justifyContent: "space-around",
-              alignItems: "center",
-              marginBottom: "10px",
-            }}
-          >
-            <Typography
-              variant="h6"
-              style={{ textAlign: "center", color: "#56042C" }}
-              className="title"
+        <section className="filter-bar">
+          {selectedTeam && (
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                minWidth: { xs: "100%", sm: "auto" },
+              }}
             >
-              {selectedCountry.toUpperCase()}'S MATCHES
-            </Typography>
-            <FormControl className="form">
-              <InputLabel>Country</InputLabel>
-              <Select
-                sx={{ minWidth: "250px" }}
-                autoWidth
-                variant="outlined"
-                value={selectedCountry}
-                label="Country"
-                onChange={(e) => setSelectedCountry(e.target.value)}
-              >
-                {uniqueCountries
-                  .slice(0, 32)
-                  .sort()
-                  .map((country, index) => (
-                    <MenuItem key={index} sx={{ minWidth: "300px" }} value={country}>
-                      {country}
-                    </MenuItem>
-                  ))}
-              </Select>
-            </FormControl>
-          </Box>
+              {selectedTeam.crest && (
+                <Avatar
+                  src={selectedTeam.crest}
+                  alt={selectedTeam.name || "TBD"}
+                  sx={{
+                    width: 42,
+                    height: 42,
+                    background: "rgba(232, 237, 245, 0.9)",
+                  }}
+                />
+              )}
+              <Box>
+                <Typography className="eyebrow">Selected Team</Typography>
+                <Typography sx={{ color: "var(--color-gold)", fontWeight: 900 }}>
+                  {selectedTeam.name || "TBD"}
+                </Typography>
+              </Box>
+            </Box>
+          )}
 
-          <Box
-            className="fix-container"
-            sx={{
-              display: "flex",
-              gap: "10px",
-              justifyContent: "center",
-            }}
-          >
-            {selectedCountryGame?.map(
-              ({ DateUtc, HomeTeam, AwayTeam, Group }, index) => (
-                <Card key={index}>
-                  <CardContent>
-                    <Typography> {Group}</Typography>
-                    <Typography
-                      sx={{ color: "#56042C" }}
-                      className="match-title"
-                      component="div"
-                      variant="h5"
-                    >
-                      {HomeTeam} VS {AwayTeam}
-                    </Typography>
+          <FormControl sx={{ minWidth: 260, marginLeft: { sm: "auto" } }}>
+            <InputLabel>Team</InputLabel>
+            <Select
+              value={selectedTeam?.id || ""}
+              label="Team"
+              onChange={(e) => setSelectedTeamId(e.target.value)}
+            >
+              {teams.map((team) => (
+                <MenuItem key={team.id} sx={{ minWidth: "260px" }} value={team.id}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                    {team.crest && (
+                      <Avatar
+                        src={team.crest}
+                        alt={team.name || "TBD"}
+                        sx={{
+                          width: 24,
+                          height: 24,
+                          background: "rgba(232, 237, 245, 0.9)",
+                        }}
+                      />
+                    )}
+                    {team.name || "TBD"}
+                  </Box>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </section>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "3px",
-                      }}
-                    >
-                      <AccessTimeIcon sx={{ color: "#FEC310" }} />
-                      <Typography
-                        sx={{ color: "#1077C3" }}
-                        variant="subtitle1"
-                        color="text.primary"
-                        component="div"
-                      >
-                        {moment(new Date(DateUtc)).format(
-                          "dddd, MMM Do Y, h:mm A"
-                        )}
-                      </Typography>
-                    </div>
-                  </CardContent>
-                </Card>
-              )
-            )}
-          </Box>
-        </Box>
+        <h2 className="section-title">
+          {selectedTeam ? `${selectedTeam.name} fixtures` : "Team fixtures"}
+        </h2>
+
+        {selectedTeamGame.length === 0 ? (
+          <div className="empty-state">
+            <strong>No matches available for this team.</strong>
+            Select another team or check back later.
+          </div>
+        ) : (
+          <div className="match-grid">
+            {selectedTeamGame.map((match) => (
+              <TeamMatchCard key={match.id} match={match} />
+            ))}
+          </div>
+        )}
       </main>
 
       <footer className={styles.footer}>
@@ -140,29 +166,30 @@ const teams = ({ fixtures }) => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{" "}
-          <span
-            style={{
-              color: "#56042c",
-              fontWeight: "600",
-            }}
-          >
-            Zahid Hasan
-          </span>
+          Powered by <span>Zahid Hasan</span>
         </a>
       </footer>
     </>
   );
 };
 
-export default teams;
+export default Teams;
 
 export async function getServerSideProps() {
-  const data = await fetch(
-    "https://fixturedownload.com/feed/json/fifa-world-cup-2022"
-  ).then((res) => res.json());
+  try {
+    const [teams, fixtures] = await Promise.all([
+      getWorldCupTeams(),
+      getWorldCupMatches(),
+    ]);
 
-  return {
-    props: { fixtures: data },
-  };
+    return {
+      props: { teams, fixtures },
+    };
+  } catch (error) {
+    console.error(error);
+
+    return {
+      props: { teams: [], fixtures: [] },
+    };
+  }
 }

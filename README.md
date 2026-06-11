@@ -1,34 +1,108 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# FIFA22 Fixtures
+
+A Next.js app for browsing FIFA World Cup matches, fixtures, teams, standings, scorers, and match results.
+
+## Features
+
+- Home page with live matches, upcoming matches, and recent results.
+- Full fixtures table with kickoff time, result status, and simple filters.
+- Team page with official teams and team-wise fixtures.
+- Standings page with World Cup group tables.
+- Scorers page with World Cup top scorers.
+- Shared navigation with route progress loading.
+- Match, team, standings, and scorer data loaded from football-data.org.
+- Dark World Cup dashboard UI with burgundy and gold accents.
+
+## Available Pages
+
+- Home: live, upcoming, and recent World Cup matches
+- Fixtures: all matches with status and stage filters
+- Teams: official teams and team-wise fixtures
+- Standings: group standings
+- Scorers: top scorers
+
+## Tech Stack
+
+- Next.js 13
+- React 18
+- Material UI
+- Moment.js
+- NProgress
 
 ## Getting Started
 
-First, run the development server:
+Install dependencies:
+
+```bash
+npm install
+```
+
+Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000` in your browser.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+## Environment Variables
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+Required environment variable:
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+```bash
+FOOTBALL_DATA_API_TOKEN=your_api_token_here
+```
 
-## Learn More
+Get the token from football-data.org, add it to `.env.local`, and restart the dev server after adding it.
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run dev      # Start the local development server
+npm run build    # Build the production app
+npm run start    # Start the production server after build
+npm run lint     # Run Next.js linting
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Project Structure
 
-## Deploy on Vercel
+```text
+components/
+  Navbar.js            # Main navigation
+pages/
+  _app.js              # Global app wrapper, navbar, route progress
+  index.js             # Home page with live, upcoming, and recent matches
+  fixtures.js          # Full fixtures and results table
+  teams.js             # Team selector and team-specific fixtures
+  standings.js         # World Cup standings
+  scorers.js           # World Cup top scorers
+public/assets/         # Optional static image assets
+styles/                # Global and module styles
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Data Source
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+The app fetches data server-side in each page using `getServerSideProps`. Phase 3 uses football-data.org endpoints for matches, teams, standings, and scorers:
+
+## API Endpoints Used
+
+```text
+/competitions/WC/matches
+/competitions/WC/teams
+/competitions/WC/standings
+/competitions/WC/scorers
+```
+
+Base URL: `https://api.football-data.org/v4`
+
+`FOOTBALL_DATA_API_TOKEN` is required in `.env.local`. If the API is unavailable, pages show empty states instead of crashing.
+
+## Deployment
+
+Build the app before deployment:
+
+```bash
+npm run build
+```
+
+This project can be deployed to any host that supports Next.js applications, including Vercel.

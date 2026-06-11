@@ -3,12 +3,12 @@
 .footer {
   display: flex;
   flex: 1;
-  padding: 2rem 0;
-  border-top: 1px solid #eaeaea;
+  padding: 2rem 1rem;
+  margin-top: 2rem;
+  border-top: 1px solid var(--color-border);
   justify-content: center;
   align-items: center;
-  color: #1077C3;
+  color: var(--color-muted);
+  text-align: center;
+  font-size: 0.9rem;
 }
-
-
-
