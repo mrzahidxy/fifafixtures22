@@ -96,8 +96,9 @@ export default function Home({ fixtures }) {
   const liveMatches = fixtures.filter((fixture) =>
     ["LIVE", "IN_PLAY", "PAUSED"].includes(fixture.status)
   );
+  const upcomingStatuses = ["SCHEDULED", "TIMED"];
   const upcomingMatches = fixtures
-    .filter((fixture) => fixture.status === "SCHEDULED")
+    .filter((fixture) => upcomingStatuses.includes(fixture.status))
     .sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate))
     .slice(0, 5);
   const recentResults = fixtures
@@ -107,7 +108,12 @@ export default function Home({ fixtures }) {
   const statCards = [
     { label: "Total Matches", value: fixtures.length },
     { label: "Live", value: liveMatches.length },
-    { label: "Upcoming", value: upcomingMatches.length },
+    {
+      label: "Upcoming",
+      value: fixtures.filter((fixture) =>
+        upcomingStatuses.includes(fixture.status)
+      ).length,
+    },
     {
       label: "Finished",
       value: fixtures.filter((fixture) => fixture.status === "FINISHED").length,
