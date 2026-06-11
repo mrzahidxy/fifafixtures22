@@ -2,7 +2,10 @@ import Head from "next/head";
 
 export default function SEO({ title, description, type = "website" }) {
   const siteName = "World Cup Hub";
-  const image = "/assets/logo.png";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+  const image = siteUrl
+    ? `${siteUrl}/assets/logo.png`
+    : "/assets/logo.png";
 
   return (
     <Head>
@@ -13,7 +16,7 @@ export default function SEO({ title, description, type = "website" }) {
       <meta name="apple-mobile-web-app-title" content={siteName} />
       <meta name="theme-color" content="#b5122b" />
       <link rel="icon" href="/favicon.ico" />
-      <link rel="apple-touch-icon" href="/assets/icon.png" />
+      <link rel="apple-touch-icon" href="/assets/icon-192.png" />
       <link rel="manifest" href="/site.webmanifest" />
 
       <meta property="og:title" content={title} />
