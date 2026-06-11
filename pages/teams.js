@@ -47,9 +47,31 @@ function TeamMatchCard({ match }) {
       <span className="eyebrow">
         {formatMatchStage(match.group || match.stage)}
       </span>
-      <h3 className="match-title">
-        {match.homeTeam || "TBD"} VS {match.awayTeam || "TBD"}
-      </h3>
+      <div className="match-teams">
+        <div className="match-team">
+          {match.homeTeamCrest && (
+            <Avatar
+              src={match.homeTeamCrest}
+              alt={`${match.homeTeam || "Home team"} flag`}
+              className="match-team-flag"
+              sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+            />
+          )}
+          <span>{match.homeTeam || "TBD"}</span>
+        </div>
+        <span className="match-versus">VS</span>
+        <div className="match-team">
+          {match.awayTeamCrest && (
+            <Avatar
+              src={match.awayTeamCrest}
+              alt={`${match.awayTeam || "Away team"} flag`}
+              className="match-team-flag"
+              sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+            />
+          )}
+          <span>{match.awayTeam || "TBD"}</span>
+        </div>
+      </div>
       <Box
         sx={{
           display: "flex",
