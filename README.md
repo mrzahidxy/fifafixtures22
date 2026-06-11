@@ -4,23 +4,21 @@ A responsive World Cup dashboard built with Next.js and football-data.org.
 
 ## Features
 
-- Fixtures and results.
-- Live, upcoming, and recent match sections.
-- Teams and team details.
-- Squad/player table.
-- Group standings.
-- Top scorers.
-- Shared navigation with route progress loading.
-- Match, team, standings, and scorer data loaded from football-data.org.
-- Responsive dark dashboard UI.
+- View World Cup fixtures, live matches, upcoming matches, and recent results.
+- Filter fixtures by match status and tournament stage.
+- Explore teams with profiles, squads, fixtures, and recent results.
+- Save a favourite team and see its matches highlighted.
+- View group standings and top scorers.
+- Switch between Dark and Normal theme modes.
+- Use a responsive dashboard across desktop and mobile.
 
 ## Available Pages
 
 - Home: live, upcoming, and recent World Cup matches
-- Fixtures: all matches with status and stage filters
-- Teams: official teams, team profile, coach, squad/player list, and team-wise fixtures
+- Fixtures: all matches with flags, status, result, and stage filters
+- Teams: team selector, favourite team action, team profile, coach, squad, fixtures, and recent results
 - Standings: group standings
-- Scorers: top scorers
+- Scorers: top scorers with team crests
 
 ## Tech Stack
 
@@ -69,16 +67,20 @@ npm run lint     # Run Next.js linting
 
 ```text
 components/
-  Navbar.js            # Main navigation
+  Navbar.js            # Main navigation and theme toggle
+  PreferredTeamContext.js
+                       # Favourite team localStorage state
+  ThemeContext.js      # Dark/Normal theme state
 pages/
-  _app.js              # Global app wrapper, navbar, route progress
+  _app.js              # Global providers, navbar, route progress
   index.js             # Home page with live, upcoming, and recent matches
   fixtures.js          # Full fixtures and results table
-  teams.js             # Team selector and team-specific fixtures
+  teams.js             # Team selector, favourite team, details, fixtures
   standings.js         # World Cup standings
   scorers.js           # World Cup top scorers
 public/assets/         # Optional static image assets
 styles/                # Global and module styles
+.github/workflows/     # Vercel deployment workflow
 ```
 
 ## Data Source
@@ -108,3 +110,11 @@ npm run build
 ```
 
 This project can be deployed to any host that supports Next.js applications, including Vercel.
+
+The included GitHub Actions workflow deploys preview builds for pull requests and production builds for pushes to `main` or `master`. Add these repository secrets before using it:
+
+```text
+VERCEL_TOKEN
+VERCEL_ORG_ID
+VERCEL_PROJECT_ID
+```
