@@ -46,7 +46,10 @@ const Standings = ({ standings }) => {
                 </Typography>
               </Box>
 
-              <Table className="dark-table" aria-label={`${standing.groupName} standings`}>
+              <Table
+                className="dark-table standings-table"
+                aria-label={`${standing.groupName} standings`}
+              >
                 <TableHead>
                   <TableRow>
                     <TableCell>Pos</TableCell>

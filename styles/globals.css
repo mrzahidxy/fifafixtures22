@@ -17,6 +17,7 @@ body {
   padding: 0;
   margin: 0;
   min-height: 100%;
+  overflow-x: hidden;
   background: var(--color-bg);
   color: var(--color-text);
   font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
@@ -37,6 +38,11 @@ a {
 
 * {
   box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
 }
 
 #__next {
@@ -102,10 +108,11 @@ a {
 .page-title {
   margin: 0;
   color: var(--color-text);
-  font-size: clamp(2rem, 5vw, 3.4rem);
+  font-size: clamp(2rem, 4.5vw, 3.4rem);
   line-height: 1.05;
   letter-spacing: 0;
   font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .page-subtitle {
@@ -130,11 +137,11 @@ a {
 }
 
 .match-grid {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
 }
 
 .stats-grid {
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
   margin-top: 24px;
 }
 
@@ -173,6 +180,7 @@ a {
   font-weight: 800;
   line-height: 1.3;
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .score-text {
@@ -203,14 +211,25 @@ a {
   flex-wrap: wrap;
   padding: 16px;
   margin-bottom: 18px;
+  min-width: 0;
 }
 
 .table-card {
+  width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .dark-table {
   min-width: 720px;
+}
+
+.standings-table {
+  min-width: 760px;
+}
+
+.table-card .dark-table {
+  width: 100%;
 }
 
 .dark-table th {
@@ -242,6 +261,7 @@ a {
   font-weight: 700;
   white-space: nowrap;
   transition: color 160ms ease;
+  flex: 0 0 auto;
 }
 
 .link svg {
@@ -256,6 +276,15 @@ a {
 
 .active {
   text-shadow: 0 0 18px rgba(214, 168, 79, 0.18);
+}
+
+.nav-links {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.nav-links::-webkit-scrollbar {
+  height: 0;
 }
 
 .MuiPaper-root {
@@ -281,21 +310,155 @@ a {
   color: inherit;
 }
 
-@media only screen and (max-width: 700px) {
+@media (max-width: 900px) {
+  .page-shell {
+    padding: 20px;
+  }
+
+  .page-header,
+  .hero-card {
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .image-banner {
+    min-height: 220px;
+  }
+
+  .section-title {
+    margin-top: 24px;
+  }
+}
+
+@media (max-width: 600px) {
   .page-shell {
     padding: 16px;
   }
 
   .page-header,
   .hero-card {
-    padding: 20px;
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+
+  .image-banner {
+    min-height: 190px;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+    line-height: 1.15;
+  }
+
+  .page-subtitle {
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .section-title {
+    font-size: 1.05rem;
+    margin: 22px 0 12px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 18px;
+  }
+
+  .match-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stat-card,
+  .match-card,
+  .empty-state {
+    padding: 14px;
+  }
+
+  .match-title {
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .eyebrow {
+    font-size: 0.7rem;
+  }
+
+  .link {
+    gap: 4px;
+    font-size: 0.8rem;
+  }
+
+  .link svg {
+    width: 16px;
+    height: 16px;
   }
 
   .filter-bar {
     flex-direction: column;
+    gap: 12px;
+    padding: 14px;
   }
 
   .filter-bar .MuiFormControl-root {
     width: 100%;
+    min-width: 0;
+  }
+
+  .dark-table {
+    min-width: 720px;
+  }
+
+  .table-card {
+    border-radius: 8px;
+  }
+
+  .dark-table th,
+  .dark-table td {
+    padding: 12px;
+  }
+
+  .MuiAvatar-root {
+    width: 28px !important;
+    height: 28px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .page-shell {
+    padding: 12px;
+  }
+
+  .page-header,
+  .hero-card {
+    padding: 16px;
+  }
+
+  .image-banner {
+    min-height: 170px;
+  }
+
+  .page-title {
+    font-size: 1.35rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .link {
+    font-size: 0.76rem;
+  }
+
+  .stat-card,
+  .match-card,
+  .empty-state {
+    padding: 12px;
   }
 }

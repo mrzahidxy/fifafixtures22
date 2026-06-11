@@ -26,11 +26,13 @@ const Navbar = () => {
         sx={{
           width: "min(1180px, 100%)",
           margin: "0 auto",
-          padding: { xs: "14px 16px", md: "16px 24px" },
+          padding: { xs: "12px 14px", sm: "14px 16px", md: "16px 24px" },
           display: "flex",
           alignItems: "center",
+          flexDirection: { xs: "column", sm: "row" },
           justifyContent: "space-between",
-          gap: "18px",
+          gap: { xs: "10px", sm: "18px" },
+          minWidth: 0,
         }}
       >
         <Typography
@@ -41,18 +43,23 @@ const Navbar = () => {
             fontWeight: 900,
             letterSpacing: 0,
             whiteSpace: "nowrap",
+            width: { xs: "100%", sm: "auto" },
+            fontSize: { xs: "1rem", sm: "1.05rem" },
           }}
         >
           World Cup Hub
         </Typography>
 
         <Box
+          className="nav-links"
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: { xs: "16px", md: "22px" },
+            gap: { xs: "14px", md: "22px" },
             overflowX: "auto",
-            paddingBottom: "2px",
+            paddingBottom: { xs: "4px", sm: "2px" },
+            width: { xs: "100%", sm: "auto" },
+            maxWidth: "100%",
           }}
         >
           <Link
