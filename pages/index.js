@@ -1,12 +1,11 @@
 import {
   Box,
-  Card,
-  CardContent,
   Chip,
   Typography,
 } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import SEO from "../components/SEO";
+import { usePreferredTeam } from "../components/PreferredTeamContext";
 import styles from "../styles/Home.module.css";
 import { getWorldCupMatches } from "../lib/footballData";
 import {
@@ -93,9 +92,21 @@ function MatchSection({ title, matches, emptyMessage }) {
 }
 
 export default function Home({ fixtures }) {
+  const { preferredTeam } = usePreferredTeam();
   const liveMatches = fixtures.filter((fixture) =>
     ["LIVE", "IN_PLAY", "PAUSED"].includes(fixture.status)
   );
+  const preferredTeamMatches = preferredTeam
+    ? fixtures
+        .filter(
+          ({ homeTeam, awayTeam }) =>
+            homeTeam === preferredTeam.name ||
+            awayTeam === preferredTeam.name ||
+            homeTeam === preferredTeam.shortName ||
+            awayTeam === preferredTeam.shortName
+        )
+        .sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate))
+    : [];
   const upcomingStatuses = ["SCHEDULED", "TIMED"];
   const upcomingMatches = fixtures
     .filter((fixture) => upcomingStatuses.includes(fixture.status))
@@ -105,21 +116,6 @@ export default function Home({ fixtures }) {
     .filter((fixture) => fixture.status === "FINISHED")
     .sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
     .slice(0, 5);
-  const statCards = [
-    { label: "Total Matches", value: fixtures.length },
-    { label: "Live", value: liveMatches.length },
-    {
-      label: "Upcoming",
-      value: fixtures.filter((fixture) =>
-        upcomingStatuses.includes(fixture.status)
-      ).length,
-    },
-    {
-      label: "Finished",
-      value: fixtures.filter((fixture) => fixture.status === "FINISHED").length,
-    },
-  ];
-
   return (
     <>
       <SEO
@@ -138,25 +134,6 @@ export default function Home({ fixtures }) {
             Track live matches, upcoming fixtures, recent results, standings,
             and top scorers.
           </p>
-
-          <div className="stats-grid">
-            {statCards.map((stat) => (
-              <Card className="card stat-card" key={stat.label}>
-                <CardContent sx={{ padding: 0, "&:last-child": { paddingBottom: 0 } }}>
-                  <Typography className="muted-text">{stat.label}</Typography>
-                  <Typography
-                    sx={{
-                      color: "var(--color-text)",
-                      fontSize: "2rem",
-                      fontWeight: 900,
-                    }}
-                  >
-                    {stat.value}
-                  </Typography>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
         </section>
 
         <MatchSection
@@ -164,6 +141,13 @@ export default function Home({ fixtures }) {
           matches={liveMatches}
           emptyMessage="No live matches right now."
         />
+        {preferredTeam && (
+          <MatchSection
+            title={`Favourite Team: ${preferredTeam.name}`}
+            matches={preferredTeamMatches}
+            emptyMessage={`No matches available for ${preferredTeam.name}.`}
+          />
+        )}
         <MatchSection
           title="Upcoming Matches"
           matches={upcomingMatches}

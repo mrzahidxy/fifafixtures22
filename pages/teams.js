@@ -1,8 +1,14 @@
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   Avatar,
   Box,
+  Button,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   FormControl,
   InputLabel,
   MenuItem,
@@ -14,8 +20,10 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import StarIcon from "@mui/icons-material/Star";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import SEO from "../components/SEO";
+import { usePreferredTeam } from "../components/PreferredTeamContext";
 import styles from "../styles/Home.module.css";
 import {
   getTeamDetails,
@@ -82,6 +90,8 @@ const Teams = ({
   hasSelectedTeamQuery,
 }) => {
   const router = useRouter();
+  const { preferredTeam, setPreferredTeam } = usePreferredTeam();
+  const [teamToConfirm, setTeamToConfirm] = useState(null);
   const selectedTeam =
     teamDetails ||
     teams.find((team) => String(team.id) === String(selectedTeamId)) ||
@@ -93,8 +103,12 @@ const Teams = ({
       (homeTeam === selectedTeam.name ||
         awayTeam === selectedTeam.name ||
         homeTeam === selectedTeam.shortName ||
-        awayTeam === selectedTeam.shortName)
+        awayTeam === selectedTeam.shortName),
   );
+  const recentTeamResults = selectedTeamGame
+    .filter((match) => match.status === "FINISHED")
+    .sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
+    .slice(0, 5);
   const squad = teamDetails?.squad || [];
   const seoTitle =
     hasSelectedTeamQuery && selectedTeam?.name
@@ -105,9 +119,47 @@ const Teams = ({
       ? `View ${selectedTeam.name} team details, coach information, squad players, and World Cup matches.`
       : "Explore World Cup teams, team profiles, crests, and team-wise fixtures.";
 
+  useEffect(() => {
+    if (
+      router.isReady &&
+      !hasSelectedTeamQuery &&
+      preferredTeam?.id &&
+      String(preferredTeam.id) !== String(selectedTeamId)
+    ) {
+      router.replace(`/teams?team=${preferredTeam.id}`);
+    }
+  }, [hasSelectedTeamQuery, preferredTeam, router, selectedTeamId]);
+
   const handleTeamChange = (event) => {
     router.push(`/teams?team=${event.target.value}`);
   };
+
+  const handleSetPreferredTeam = () => {
+    if (selectedTeam) {
+      setTeamToConfirm({
+        id: selectedTeam.id,
+        name: selectedTeam.name,
+        shortName: selectedTeam.shortName,
+        crest: selectedTeam.crest,
+      });
+    }
+  };
+
+  const handleConfirmPreferredTeam = () => {
+    if (teamToConfirm) {
+      setPreferredTeam({
+        id: teamToConfirm.id,
+        name: teamToConfirm.name,
+        shortName: teamToConfirm.shortName,
+        crest: teamToConfirm.crest,
+      });
+    }
+
+    setTeamToConfirm(null);
+  };
+
+  const isPreferredTeam =
+    selectedTeam && String(preferredTeam?.id) === String(selectedTeam.id);
 
   return (
     <>
@@ -125,35 +177,6 @@ const Teams = ({
         </header>
 
         <section className="filter-bar">
-          {selectedTeam && (
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: "12px",
-                minWidth: { xs: "100%", sm: "auto" },
-              }}
-            >
-              {selectedTeam.crest && (
-                <Avatar
-                  src={selectedTeam.crest}
-                  alt={`${selectedTeam.name || "Selected team"} crest`}
-                  sx={{
-                    width: 42,
-                    height: 42,
-                    background: "rgba(232, 237, 245, 0.9)",
-                  }}
-                />
-              )}
-              <Box>
-                <Typography className="eyebrow">Selected Team</Typography>
-                <Typography sx={{ color: "var(--color-gold)", fontWeight: 900 }}>
-                  {selectedTeam.name || "TBD"}
-                </Typography>
-              </Box>
-            </Box>
-          )}
-
           <FormControl sx={{ minWidth: 260, marginLeft: { sm: "auto" } }}>
             <InputLabel>Team</InputLabel>
             <Select
@@ -162,8 +185,14 @@ const Teams = ({
               onChange={handleTeamChange}
             >
               {teams.map((team) => (
-                <MenuItem key={team.id} sx={{ minWidth: "260px" }} value={team.id}>
-                  <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <MenuItem
+                  key={team.id}
+                  sx={{ minWidth: "260px" }}
+                  value={team.id}
+                >
+                  <Box
+                    sx={{ display: "flex", alignItems: "center", gap: "8px" }}
+                  >
                     {team.crest && (
                       <Avatar
                         src={team.crest}
@@ -181,7 +210,72 @@ const Teams = ({
               ))}
             </Select>
           </FormControl>
+
+          {selectedTeam && (
+            <Chip
+              icon={<StarIcon />}
+              label={isPreferredTeam ? "Favourite team" : "Set favourite"}
+              onClick={handleSetPreferredTeam}
+              disabled={isPreferredTeam}
+              sx={{
+                alignSelf: "center",
+                color: "var(--color-gold)",
+                borderColor: "var(--color-gold)",
+                fontWeight: 800,
+              }}
+              variant="outlined"
+            />
+          )}
         </section>
+
+        <Dialog
+          open={Boolean(teamToConfirm)}
+          onClose={() => setTeamToConfirm(null)}
+          PaperProps={{ className: "confirm-dialog" }}
+        >
+          <DialogTitle>Set favourite team?</DialogTitle>
+          <DialogContent>
+            <Box className="confirm-team-preview">
+              {teamToConfirm?.crest && (
+                <Avatar
+                  src={teamToConfirm.crest}
+                  alt={`${teamToConfirm.name || "Team"} crest`}
+                  sx={{
+                    width: 58,
+                    height: 58,
+                    background: "rgba(232, 237, 245, 0.9)",
+                  }}
+                />
+              )}
+              <Box sx={{ minWidth: 0 }}>
+                <Typography className="eyebrow">Favourite team</Typography>
+                <Typography className="preferred-team-name">
+                  {teamToConfirm?.name || "Selected team"}
+                </Typography>
+                <Typography className="muted-text">
+                  This team will be highlighted on the home page.
+                </Typography>
+              </Box>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setTeamToConfirm(null)}>Cancel</Button>
+            <Button
+              onClick={handleConfirmPreferredTeam}
+              variant="contained"
+              sx={{
+                background: "var(--color-gold)",
+                color: "var(--color-bg)",
+                fontWeight: 800,
+                "&:hover": {
+                  background: "#efc66e",
+                },
+              }}
+            >
+              Confirm
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         {teamDetails ? (
           <>
@@ -200,7 +294,9 @@ const Teams = ({
                 <Typography className="eyebrow">
                   {displayValue(teamDetails.tla)}
                 </Typography>
-                <h3 className="match-title">{displayValue(teamDetails.name)}</h3>
+                <h3 className="match-title">
+                  {displayValue(teamDetails.name)}
+                </h3>
                 <Typography className="muted-text">
                   {displayValue(teamDetails.shortName)}
                 </Typography>
@@ -234,9 +330,7 @@ const Teams = ({
               </div>
             </section>
 
-            <h2 className="section-title">
-              {selectedTeam ? `${selectedTeam.name} fixtures` : "Team fixtures"}
-            </h2>
+            <h2 className="section-title">Upcoming Matches</h2>
 
             {selectedTeamGame.length === 0 ? (
               <div className="empty-state">
@@ -246,6 +340,21 @@ const Teams = ({
             ) : (
               <div className="match-grid">
                 {selectedTeamGame.map((match) => (
+                  <TeamMatchCard key={match.id} match={match} />
+                ))}
+              </div>
+            )}
+
+            <h2 className="section-title">Recent Results</h2>
+
+            {recentTeamResults.length === 0 ? (
+              <div className="empty-state">
+                <strong>No recent results for this team.</strong>
+                Finished matches will appear here when available.
+              </div>
+            ) : (
+              <div className="match-grid">
+                {recentTeamResults.map((match) => (
                   <TeamMatchCard key={match.id} match={match} />
                 ))}
               </div>
@@ -270,7 +379,9 @@ const Teams = ({
                     {squad.map((player) => (
                       <TableRow
                         key={player.id || player.name}
-                        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
                       >
                         <TableCell>
                           <Typography sx={{ fontWeight: 900 }}>

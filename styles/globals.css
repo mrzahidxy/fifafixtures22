@@ -285,6 +285,75 @@ img {
   min-width: 0;
 }
 
+.preferred-team-panel {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: min(360px, 100%);
+  padding: 10px 12px;
+  border: 1px solid rgba(214, 168, 79, 0.28);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(214, 168, 79, 0.14), rgba(122, 23, 52, 0.08)),
+    rgba(21, 28, 46, 0.72);
+}
+
+.preferred-team-crest-wrap {
+  display: grid;
+  place-items: center;
+  width: 62px;
+  height: 62px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+  background: rgba(232, 237, 245, 0.08);
+  border: 1px solid rgba(232, 237, 245, 0.12);
+}
+
+.preferred-team-crest {
+  width: 46px !important;
+  height: 46px !important;
+}
+
+.preferred-team-fallback {
+  color: var(--color-gold);
+  font-size: 30px !important;
+}
+
+.preferred-team-name {
+  color: var(--color-text);
+  font-weight: 900;
+  overflow-wrap: anywhere;
+}
+
+.preferred-chip {
+  color: var(--color-muted) !important;
+  border: 1px solid var(--color-border) !important;
+  background: rgba(232, 237, 245, 0.05) !important;
+  font-weight: 800;
+}
+
+.preferred-chip.active {
+  color: var(--color-gold) !important;
+  border-color: rgba(214, 168, 79, 0.62) !important;
+  background: rgba(214, 168, 79, 0.11) !important;
+}
+
+.confirm-dialog {
+  border: 1px solid rgba(214, 168, 79, 0.32);
+  border-radius: 8px !important;
+}
+
+.confirm-team-preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: min(360px, calc(100vw - 80px));
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+  background: rgba(11, 16, 32, 0.42);
+}
+
 .table-card {
   width: 100%;
   overflow-x: auto;
@@ -486,6 +555,25 @@ img {
     flex-direction: column;
     gap: 12px;
     padding: 14px;
+  }
+
+  .preferred-team-panel {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .preferred-team-crest-wrap {
+    width: 52px;
+    height: 52px;
+  }
+
+  .preferred-team-crest {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .confirm-team-preview {
+    min-width: 0;
   }
 
   .filter-bar .MuiFormControl-root {
