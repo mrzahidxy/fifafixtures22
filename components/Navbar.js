@@ -44,6 +44,9 @@ const Navbar = () => {
           component={Link}
           href="/"
           sx={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "10px",
             color: "var(--color-text)",
             fontWeight: 900,
             letterSpacing: 0,
@@ -52,6 +55,19 @@ const Navbar = () => {
             fontSize: { xs: "1rem", sm: "1.05rem" },
           }}
         >
+          <Box
+            component="img"
+            src="/assets/icon.png"
+            alt=""
+            aria-hidden="true"
+            sx={{
+              width: 34,
+              height: 34,
+              borderRadius: "8px",
+              objectFit: "cover",
+              flex: "0 0 auto",
+            }}
+          />
           World Cup Hub
         </Typography>
 

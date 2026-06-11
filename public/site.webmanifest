@@ -1,0 +1,18 @@
+{
+  "name": "World Cup Hub",
+  "short_name": "World Cup Hub",
+  "description": "A World Cup dashboard for fixtures, results, teams, standings, and scorers.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#b5122b",
+  "icons": [
+    {
+      "src": "/assets/icon.png",
+      "sizes": "1536x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
