@@ -156,6 +156,77 @@ img {
   gap: 12px;
 }
 
+.team-card-link {
+  display: block;
+  min-width: 0;
+}
+
+.team-card-link:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.team-card {
+  display: flex;
+  min-height: 118px;
+  padding: 18px;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.team-card-action,
+.back-link {
+  color: var(--color-gold);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.team-detail-hero {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+  margin-bottom: 18px;
+}
+
+.team-detail-crest {
+  width: 84px !important;
+  height: 84px !important;
+  flex: 0 0 auto;
+}
+
+.team-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: 16px;
+  padding: 22px;
+}
+
+.team-meta-grid div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.team-meta-grid strong,
+.team-meta-grid a {
+  color: var(--color-text);
+  overflow-wrap: anywhere;
+}
+
+.back-link {
+  display: inline-flex;
+  margin-bottom: 14px;
+  transition: color 160ms ease;
+}
+
+.back-link:hover {
+  color: var(--color-text);
+}
+
 .match-card:hover,
 .card:hover {
   background: var(--color-surface-hover);
@@ -373,8 +444,23 @@ img {
 
   .stat-card,
   .match-card,
+  .team-card,
   .empty-state {
     padding: 14px;
+  }
+
+  .team-detail-hero {
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .team-detail-crest {
+    width: 56px !important;
+    height: 56px !important;
+  }
+
+  .team-meta-grid {
+    padding: 16px;
   }
 
   .match-title {
@@ -458,6 +544,7 @@ img {
 
   .stat-card,
   .match-card,
+  .team-card,
   .empty-state {
     padding: 12px;
   }

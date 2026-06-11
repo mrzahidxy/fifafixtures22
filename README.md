@@ -17,7 +17,7 @@ A Next.js app for browsing FIFA World Cup matches, fixtures, teams, standings, s
 
 - Home: live, upcoming, and recent World Cup matches
 - Fixtures: all matches with status and stage filters
-- Teams: official teams and team-wise fixtures
+- Teams: official teams, team profile, coach, squad/player list, and team-wise fixtures
 - Standings: group standings
 - Scorers: top scorers
 
@@ -89,6 +89,7 @@ The app fetches data server-side in each page using `getServerSideProps`. Phase 
 ```text
 /competitions/WC/matches
 /competitions/WC/teams
+/teams/{teamId}
 /competitions/WC/standings
 /competitions/WC/scorers
 ```

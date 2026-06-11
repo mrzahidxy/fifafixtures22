@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRouter } from "next/router";
 import {
   Avatar,
   Box,
@@ -7,17 +7,30 @@ import {
   InputLabel,
   MenuItem,
   Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
   Typography,
 } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import styles from "../styles/Home.module.css";
-import { getWorldCupMatches, getWorldCupTeams } from "../lib/footballData";
+import {
+  getTeamDetails,
+  getWorldCupMatches,
+  getWorldCupTeams,
+} from "../lib/footballData";
 import {
   formatMatchDateTime,
   formatMatchScore,
   formatMatchStage,
   formatMatchStatus,
 } from "../lib/formatters";
+
+function displayValue(value) {
+  return value || "Not available";
+}
 
 function TeamMatchCard({ match }) {
   return (
@@ -60,15 +73,26 @@ function TeamMatchCard({ match }) {
   );
 }
 
-const Teams = ({ teams, fixtures }) => {
-  const [selectedTeamId, setSelectedTeamId] = useState(teams[0]?.id || "");
+const Teams = ({ teams, fixtures, teamDetails, selectedTeamId }) => {
+  const router = useRouter();
   const selectedTeam =
-    teams.find((team) => team.id === selectedTeamId) || teams[0] || null;
+    teamDetails ||
+    teams.find((team) => String(team.id) === String(selectedTeamId)) ||
+    teams[0] ||
+    null;
   const selectedTeamGame = fixtures.filter(
     ({ homeTeam, awayTeam }) =>
       selectedTeam &&
-      (homeTeam === selectedTeam.name || awayTeam === selectedTeam.name)
+      (homeTeam === selectedTeam.name ||
+        awayTeam === selectedTeam.name ||
+        homeTeam === selectedTeam.shortName ||
+        awayTeam === selectedTeam.shortName)
   );
+  const squad = teamDetails?.squad || [];
+
+  const handleTeamChange = (event) => {
+    router.push(`/teams?team=${event.target.value}`);
+  };
 
   return (
     <>
@@ -118,7 +142,7 @@ const Teams = ({ teams, fixtures }) => {
             <Select
               value={selectedTeam?.id || ""}
               label="Team"
-              onChange={(e) => setSelectedTeamId(e.target.value)}
+              onChange={handleTeamChange}
             >
               {teams.map((team) => (
                 <MenuItem key={team.id} sx={{ minWidth: "260px" }} value={team.id}>
@@ -142,21 +166,115 @@ const Teams = ({ teams, fixtures }) => {
           </FormControl>
         </section>
 
-        <h2 className="section-title">
-          {selectedTeam ? `${selectedTeam.name} fixtures` : "Team fixtures"}
-        </h2>
+        {teamDetails ? (
+          <>
+            <h2 className="section-title">Team Details</h2>
 
-        {selectedTeamGame.length === 0 ? (
-          <div className="empty-state">
-            <strong>No matches available for this team.</strong>
-            Select another team or check back later.
-          </div>
+            <section className="card team-detail-hero">
+              {teamDetails.crest && (
+                <Avatar
+                  src={teamDetails.crest}
+                  alt={teamDetails.name}
+                  className="team-detail-crest"
+                  sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+                />
+              )}
+              <Box sx={{ minWidth: 0 }}>
+                <Typography className="eyebrow">
+                  {displayValue(teamDetails.tla)}
+                </Typography>
+                <h3 className="match-title">{displayValue(teamDetails.name)}</h3>
+                <Typography className="muted-text">
+                  {displayValue(teamDetails.shortName)}
+                </Typography>
+              </Box>
+            </section>
+
+            <section className="card team-meta-grid" aria-label="Team metadata">
+              <div>
+                <span className="eyebrow">Short Name</span>
+                <strong>{displayValue(teamDetails.shortName)}</strong>
+              </div>
+              <div>
+                <span className="eyebrow">Team Code</span>
+                <strong>{displayValue(teamDetails.tla)}</strong>
+              </div>
+              <div>
+                <span className="eyebrow">Founded</span>
+                <strong>{displayValue(teamDetails.founded)}</strong>
+              </div>
+              <div>
+                <span className="eyebrow">Venue</span>
+                <strong>{displayValue(teamDetails.venue)}</strong>
+              </div>
+              <div>
+                <span className="eyebrow">Coach</span>
+                <strong>{displayValue(teamDetails.coach?.name)}</strong>
+              </div>
+              <div>
+                <span className="eyebrow">Squad Size</span>
+                <strong>{squad.length || "Not available"}</strong>
+              </div>
+            </section>
+
+            <h2 className="section-title">
+              {selectedTeam ? `${selectedTeam.name} fixtures` : "Team fixtures"}
+            </h2>
+
+            {selectedTeamGame.length === 0 ? (
+              <div className="empty-state">
+                <strong>No matches available for this team.</strong>
+                Select another team or check back later.
+              </div>
+            ) : (
+              <div className="match-grid">
+                {selectedTeamGame.map((match) => (
+                  <TeamMatchCard key={match.id} match={match} />
+                ))}
+              </div>
+            )}
+
+            <h2 className="section-title">Squad</h2>
+
+            {squad.length === 0 ? (
+              <div className="empty-state">
+                <strong>No squad data available yet.</strong>
+              </div>
+            ) : (
+              <Box className="table-card table-scroll">
+                <Table className="dark-table" aria-label="team squad table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Player</TableCell>
+                      <TableCell>Position</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {squad.map((player) => (
+                      <TableRow
+                        key={player.id || player.name}
+                        sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                      >
+                        <TableCell>
+                          <Typography sx={{ fontWeight: 900 }}>
+                            {displayValue(player.name)}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{displayValue(player.position)}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </Box>
+            )}
+          </>
         ) : (
-          <div className="match-grid">
-            {selectedTeamGame.map((match) => (
-              <TeamMatchCard key={match.id} match={match} />
-            ))}
-          </div>
+          selectedTeam && (
+            <div className="empty-state">
+              <strong>Team details are not available.</strong>
+              Fixtures can still be shown for the selected team.
+            </div>
+          )
         )}
       </main>
 
@@ -175,21 +293,31 @@ const Teams = ({ teams, fixtures }) => {
 
 export default Teams;
 
-export async function getServerSideProps() {
+export async function getServerSideProps({ query }) {
   try {
     const [teams, fixtures] = await Promise.all([
       getWorldCupTeams(),
       getWorldCupMatches(),
     ]);
+    const selectedTeamId = query.team || teams[0]?.id || "";
+    let teamDetails = null;
+
+    if (selectedTeamId) {
+      try {
+        teamDetails = await getTeamDetails(selectedTeamId);
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
     return {
-      props: { teams, fixtures },
+      props: { teams, fixtures, teamDetails, selectedTeamId },
     };
   } catch (error) {
     console.error(error);
 
     return {
-      props: { teams: [], fixtures: [] },
+      props: { teams: [], fixtures: [], teamDetails: null, selectedTeamId: "" },
     };
   }
 }
