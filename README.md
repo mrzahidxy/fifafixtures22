@@ -50,9 +50,11 @@ Required environment variable:
 
 ```bash
 FOOTBALL_DATA_API_TOKEN=your_api_token_here
+NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ```
 
 Get the token from football-data.org, add it to `.env.local`, and restart the dev server after adding it.
+Set `NEXT_PUBLIC_SITE_URL` to the deployed site URL so LinkedIn, Facebook, and other social previews can fetch the card image reliably.
 
 ## Scripts
 
