@@ -1,6 +1,7 @@
 import "../styles/globals.css";
 import Navbar from "../components/Navbar";
 import { PreferredTeamProvider } from "../components/PreferredTeamContext";
+import { ThemeProvider } from "../components/ThemeContext";
 import NProgress from 'nprogress';
 import "nprogress/nprogress.css";
 import Router from 'next/router';
@@ -19,10 +20,12 @@ Router.events.on('routeChangeError', () => NProgress.done());
 
 function MyApp({ Component, pageProps }) {
   return (
-    <PreferredTeamProvider>
-      <Navbar />
-      <Component {...pageProps} />
-    </PreferredTeamProvider>
+    <ThemeProvider>
+      <PreferredTeamProvider>
+        <Navbar />
+        <Component {...pageProps} />
+      </PreferredTeamProvider>
+    </ThemeProvider>
   );
 }
 

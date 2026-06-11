@@ -1,14 +1,19 @@
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { Box, Typography } from "@mui/material";
+import { Box, IconButton, Typography } from "@mui/material";
 import HomeIcon from "@mui/icons-material/Home";
 import GroupsIcon from "@mui/icons-material/Groups";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import TableChartIcon from "@mui/icons-material/TableChart";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import DarkModeIcon from "@mui/icons-material/DarkMode";
+import LightModeIcon from "@mui/icons-material/LightMode";
+import { useThemeMode } from "./ThemeContext";
 
 const Navbar = () => {
   const router = useRouter();
+  const { themeMode, toggleThemeMode } = useThemeMode();
+  const isDark = themeMode === "dark";
 
   return (
     <Box
@@ -17,7 +22,7 @@ const Navbar = () => {
         position: "sticky",
         top: 0,
         zIndex: 20,
-        background: "rgba(21, 28, 46, 0.92)",
+        background: "var(--color-nav-bg)",
         backdropFilter: "blur(12px)",
         borderBottom: "1px solid var(--color-border)",
       }}
@@ -51,48 +56,68 @@ const Navbar = () => {
         </Typography>
 
         <Box
-          className="nav-links"
           sx={{
             display: "flex",
             alignItems: "center",
-            gap: { xs: "14px", md: "22px" },
-            overflowX: "auto",
-            paddingBottom: { xs: "4px", sm: "2px" },
+            gap: { xs: "10px", md: "18px" },
             width: { xs: "100%", sm: "auto" },
             maxWidth: "100%",
+            minWidth: 0,
           }}
         >
-          <Link
-            href="/"
-            className={router.pathname == "/" ? "link active" : "link"}
+          <Box
+            className="nav-links"
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: { xs: "14px", md: "22px" },
+              overflowX: "auto",
+              paddingBottom: { xs: "4px", sm: "2px" },
+              maxWidth: "100%",
+              minWidth: 0,
+            }}
           >
-            <HomeIcon /> Home
-          </Link>
-          <Link
-            href="/fixtures"
-            className={router.pathname == "/fixtures" ? "link active" : "link"}
+            <Link
+              href="/"
+              className={router.pathname == "/" ? "link active" : "link"}
+            >
+              <HomeIcon /> Home
+            </Link>
+            <Link
+              href="/fixtures"
+              className={router.pathname == "/fixtures" ? "link active" : "link"}
+            >
+              <ReceiptLongIcon />
+              Fixtures
+            </Link>
+            <Link
+              href="/teams"
+              className={router.pathname == "/teams" ? "link active" : "link"}
+            >
+              <GroupsIcon /> Teams
+            </Link>
+            <Link
+              href="/standings"
+              className={router.pathname == "/standings" ? "link active" : "link"}
+            >
+              <TableChartIcon /> Standings
+            </Link>
+            <Link
+              href="/scorers"
+              className={router.pathname == "/scorers" ? "link active" : "link"}
+            >
+              <EmojiEventsIcon /> Scorers
+            </Link>
+          </Box>
+
+          <IconButton
+            className="theme-toggle"
+            onClick={toggleThemeMode}
+            size="small"
+            aria-label={isDark ? "Switch to normal mode" : "Switch to dark mode"}
           >
-            <ReceiptLongIcon />
-            Fixtures
-          </Link>
-          <Link
-            href="/teams"
-            className={router.pathname == "/teams" ? "link active" : "link"}
-          >
-            <GroupsIcon /> Teams
-          </Link>
-          <Link
-            href="/standings"
-            className={router.pathname == "/standings" ? "link active" : "link"}
-          >
-            <TableChartIcon /> Standings
-          </Link>
-          <Link
-            href="/scorers"
-            className={router.pathname == "/scorers" ? "link active" : "link"}
-          >
-            <EmojiEventsIcon /> Scorers
-          </Link>
+            {isDark ? <DarkModeIcon /> : <LightModeIcon />}
+          </IconButton>
         </Box>
       </Box>
     </Box>

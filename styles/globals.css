@@ -1,7 +1,13 @@
 :root {
   --color-bg: #0B1020;
+  --color-bg-start: #0E1528;
   --color-surface: #151C2E;
   --color-surface-hover: #1D263A;
+  --color-card-bg: rgba(17, 24, 39, 0.9);
+  --color-nav-bg: rgba(21, 28, 46, 0.92);
+  --color-table-head: rgba(29, 38, 58, 0.78);
+  --color-table-hover: rgba(29, 38, 58, 0.46);
+  --color-soft-bg: rgba(232, 237, 245, 0.05);
   --color-primary: #7A1734;
   --color-gold: #D6A84F;
   --color-text: #E8EDF5;
@@ -10,6 +16,26 @@
   --color-success: #5BBF7A;
   --color-danger: #D76A6A;
   --color-info: #6CB6D8;
+}
+
+:root[data-theme="normal"] {
+  --color-bg: #F5F7FB;
+  --color-bg-start: #EDF2F7;
+  --color-surface: #FFFFFF;
+  --color-surface-hover: #EEF3F8;
+  --color-card-bg: rgba(255, 255, 255, 0.94);
+  --color-nav-bg: rgba(255, 255, 255, 0.92);
+  --color-table-head: rgba(238, 243, 248, 0.95);
+  --color-table-hover: rgba(232, 238, 246, 0.78);
+  --color-soft-bg: rgba(11, 16, 32, 0.04);
+  --color-primary: #8C1D40;
+  --color-gold: #9B6B1F;
+  --color-text: #132036;
+  --color-muted: #53627A;
+  --color-border: #CAD4E2;
+  --color-success: #237A43;
+  --color-danger: #B44343;
+  --color-info: #246C8F;
 }
 
 html,
@@ -28,7 +54,7 @@ body {
   background:
     radial-gradient(circle at top left, rgba(122, 23, 52, 0.18), transparent 34rem),
     radial-gradient(circle at bottom right, rgba(46, 62, 94, 0.22), transparent 30rem),
-    linear-gradient(180deg, #0E1528 0%, var(--color-bg) 40rem);
+    linear-gradient(180deg, var(--color-bg-start) 0%, var(--color-bg) 40rem);
 }
 
 a {
@@ -63,6 +89,7 @@ img {
 .filter-bar,
 .empty-state {
   background: rgba(17, 24, 39, 0.9);
+  background: var(--color-card-bg);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   box-shadow: 0 16px 36px rgba(4, 9, 20, 0.28);
@@ -383,7 +410,7 @@ img {
   border-radius: 8px;
   background:
     linear-gradient(135deg, rgba(214, 168, 79, 0.14), rgba(122, 23, 52, 0.08)),
-    rgba(21, 28, 46, 0.72);
+    var(--color-card-bg);
 }
 
 .preferred-team-crest-wrap {
@@ -416,7 +443,7 @@ img {
 .preferred-chip {
   color: var(--color-muted) !important;
   border: 1px solid var(--color-border) !important;
-  background: rgba(232, 237, 245, 0.05) !important;
+  background: var(--color-soft-bg) !important;
   font-weight: 800;
 }
 
@@ -439,7 +466,7 @@ img {
   padding: 12px;
   border-radius: 8px;
   border: 1px solid var(--color-border);
-  background: rgba(11, 16, 32, 0.42);
+  background: var(--color-soft-bg);
 }
 
 .table-card {
@@ -463,7 +490,7 @@ img {
 .dark-table th {
   color: var(--color-muted);
   font-weight: 800;
-  background: rgba(29, 38, 58, 0.78);
+  background: var(--color-table-head);
   border-bottom-color: var(--color-border);
 }
 
@@ -473,7 +500,7 @@ img {
 }
 
 .dark-table tr:hover td {
-  background: rgba(29, 38, 58, 0.46);
+  background: var(--color-table-hover);
 }
 
 .title {
@@ -513,6 +540,20 @@ img {
 
 .nav-links::-webkit-scrollbar {
   height: 0;
+}
+
+.theme-toggle {
+  flex: 0 0 auto;
+  width: 36px !important;
+  height: 36px !important;
+  color: var(--color-text) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 8px !important;
+  background: var(--color-soft-bg) !important;
+}
+
+.theme-toggle:hover {
+  border-color: var(--color-gold) !important;
 }
 
 .MuiPaper-root {
