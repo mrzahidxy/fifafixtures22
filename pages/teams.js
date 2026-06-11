@@ -41,6 +41,18 @@ function displayValue(value) {
   return value || "Not available";
 }
 
+const upcomingMatchStatuses = ["SCHEDULED", "TIMED"];
+
+function isUpcomingMatch(match, now = Date.now()) {
+  if (!upcomingMatchStatuses.includes(match.status) || !match.utcDate) {
+    return false;
+  }
+
+  const matchDate = new Date(match.utcDate).getTime();
+
+  return Number.isFinite(matchDate) && matchDate >= now;
+}
+
 function TeamMatchCard({ match }) {
   return (
     <article className="match-card">
@@ -131,6 +143,9 @@ const Teams = ({
     .filter((match) => match.status === "FINISHED")
     .sort((a, b) => new Date(b.utcDate) - new Date(a.utcDate))
     .slice(0, 5);
+  const upcomingTeamMatches = selectedTeamGame
+    .filter((match) => isUpcomingMatch(match))
+    .sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate));
   const squad = teamDetails?.squad || [];
   const seoTitle =
     hasSelectedTeamQuery && selectedTeam?.name
@@ -354,14 +369,14 @@ const Teams = ({
 
             <h2 className="section-title">Upcoming Matches</h2>
 
-            {selectedTeamGame.length === 0 ? (
+            {upcomingTeamMatches.length === 0 ? (
               <div className="empty-state">
-                <strong>No matches available for this team.</strong>
+                <strong>No upcoming matches for this team.</strong>
                 Select another team or check back later.
               </div>
             ) : (
               <div className="match-grid">
-                {selectedTeamGame.map((match) => (
+                {upcomingTeamMatches.map((match) => (
                   <TeamMatchCard key={match.id} match={match} />
                 ))}
               </div>

@@ -39,24 +39,31 @@ function StatusChip({ status }) {
   );
 }
 
+const statusOptions = [
+  { label: "All", value: "All" },
+  { label: "Scheduled", value: "SCHEDULED" },
+  { label: "Live", value: "LIVE" },
+  { label: "In Play", value: "IN_PLAY" },
+  { label: "Half Time", value: "PAUSED" },
+  { label: "Finished", value: "FINISHED" },
+];
+
+const statusFilterGroups = {
+  SCHEDULED: ["SCHEDULED", "TIMED"],
+};
+
 const Fixtures = ({ fixtures }) => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [stageFilter, setStageFilter] = useState("All");
-  const statusOptions = [
-    "All",
-    "SCHEDULED",
-    "LIVE",
-    "IN_PLAY",
-    "PAUSED",
-    "FINISHED",
-  ];
   const stageOptions = [
     "All",
     ...new Set(fixtures.map((fixture) => fixture.stage).filter(Boolean)),
   ];
   const filteredFixtures = fixtures.filter((fixture) => {
+    const statusMatches =
+      statusFilterGroups[statusFilter] || [statusFilter];
     const matchesStatus =
-      statusFilter === "All" || fixture.status === statusFilter;
+      statusFilter === "All" || statusMatches.includes(fixture.status);
     const matchesStage = stageFilter === "All" || fixture.stage === stageFilter;
 
     return matchesStatus && matchesStage;
@@ -89,8 +96,8 @@ const Fixtures = ({ fixtures }) => {
               onChange={(e) => setStatusFilter(e.target.value)}
             >
               {statusOptions.map((status) => (
-                <MenuItem key={status} value={status}>
-                  {status}
+                <MenuItem key={status.value} value={status.value}>
+                  {status.label}
                 </MenuItem>
               ))}
             </Select>
