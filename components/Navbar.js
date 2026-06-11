@@ -1,4 +1,3 @@
-import React from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { Box, Typography } from "@mui/material";
