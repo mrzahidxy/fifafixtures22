@@ -871,6 +871,66 @@ img {
   color: var(--color-muted);
 }
 
+.player-detail-link,
+.person-detail-link {
+  color: var(--color-gold);
+  text-decoration: none;
+}
+
+.player-detail-link:hover,
+.person-detail-link:hover {
+  text-decoration: underline;
+}
+
+.person-detail-header {
+  background:
+    linear-gradient(135deg, rgba(122, 23, 52, 0.36), rgba(21, 28, 46, 0.94)),
+    radial-gradient(circle at top right, rgba(214, 168, 79, 0.12), transparent 24rem);
+}
+
+.person-detail-heading,
+.person-team-summary {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.person-detail-team-crest {
+  width: 88px !important;
+  height: 88px !important;
+  flex: 0 0 auto;
+}
+
+.person-team-summary .match-detail-meta-grid {
+  flex: 1;
+}
+
+.person-competition-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+  gap: 14px;
+}
+
+.person-competition-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.person-competition-emblem {
+  width: 52px !important;
+  height: 52px !important;
+  flex: 0 0 auto;
+}
+
+.person-detail-empty {
+  min-height: 0;
+}
+
 @media (max-width: 900px) {
   .page-shell {
     padding: 20px;
@@ -1157,6 +1217,16 @@ img {
     gap: 8px;
     font-size: 0.82rem;
   }
+
+  .person-detail-heading,
+  .person-team-summary {
+    align-items: flex-start;
+  }
+
+  .person-detail-team-crest {
+    width: 64px !important;
+    height: 64px !important;
+  }
 }
 
 @media (max-width: 380px) {
@@ -1202,5 +1272,9 @@ img {
 
   .match-detail-scoreboard {
     grid-template-columns: minmax(0, 1fr) 64px minmax(0, 1fr);
+  }
+
+  .person-team-summary {
+    flex-direction: column;
   }
 }

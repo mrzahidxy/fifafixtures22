@@ -90,6 +90,19 @@ function formatScore(score) {
   return home == null || away == null ? null : `${home} – ${away}`;
 }
 
+function PlayerName({ player, fallback = NOT_AVAILABLE }) {
+  const name = player?.name || fallback;
+  const hasValidId = /^[1-9]\d*$/.test(String(player?.id || ""));
+
+  return hasValidId ? (
+    <Link href={`/persons/${player.id}`} className="player-detail-link">
+      {name}
+    </Link>
+  ) : (
+    name
+  );
+}
+
 function DetailItem({ label, value }) {
   if (!hasValue(value)) {
     return null;
@@ -256,23 +269,45 @@ function Timeline({ match }) {
       minute: goal?.minute,
       injuryTime: goal?.injuryTime,
       label: "Goal",
-      title: [goal?.scorer?.name, goal?.team?.name].filter(Boolean).join(" · "),
-      detail: [
-        goal?.assist?.name && `Assist: ${goal.assist.name}`,
-        goal?.type && `Type: ${formatEnum(goal.type)}`,
-        formatScore(goal?.score) && `Score: ${formatScore(goal.score)}`,
-      ]
-        .filter(Boolean)
-        .join(" · "),
+      title: (
+        <>
+          <PlayerName player={goal?.scorer} />
+          {goal?.team?.name ? ` · ${goal.team.name}` : ""}
+        </>
+      ),
+      detail: (
+        <>
+          {goal?.assist?.name && (
+            <>
+              Assist: <PlayerName player={goal.assist} />
+            </>
+          )}
+          {goal?.type && (
+            <>
+              {goal?.assist?.name ? " · " : ""}
+              Type: {formatEnum(goal.type)}
+            </>
+          )}
+          {formatScore(goal?.score) && (
+            <>
+              {goal?.assist?.name || goal?.type ? " · " : ""}
+              Score: {formatScore(goal.score)}
+            </>
+          )}
+        </>
+      ),
     }));
     const bookings = (match?.bookings || []).map((booking, index) => ({
       key: `booking-${index}`,
       minute: booking?.minute,
       injuryTime: booking?.injuryTime,
       label: "Booking",
-      title: [booking?.player?.name, booking?.team?.name]
-        .filter(Boolean)
-        .join(" · "),
+      title: (
+        <>
+          <PlayerName player={booking?.player} />
+          {booking?.team?.name ? ` · ${booking.team.name}` : ""}
+        </>
+      ),
       detail: formatEnum(booking?.card),
     }));
     const substitutions = (match?.substitutions || []).map(
@@ -282,14 +317,21 @@ function Timeline({ match }) {
         injuryTime: substitution?.injuryTime,
         label: "Substitution",
         title: substitution?.team?.name || "",
-        detail: [
-          substitution?.playerIn?.name &&
-            `${substitution.playerIn.name} in`,
-          substitution?.playerOut?.name &&
-            `${substitution.playerOut.name} out`,
-        ]
-          .filter(Boolean)
-          .join(" · "),
+        detail: (
+          <>
+            {substitution?.playerIn?.name && (
+              <>
+                <PlayerName player={substitution.playerIn} /> in
+              </>
+            )}
+            {substitution?.playerOut?.name && (
+              <>
+                {substitution?.playerIn?.name ? " · " : ""}
+                <PlayerName player={substitution.playerOut} /> out
+              </>
+            )}
+          </>
+        ),
       })
     );
 
@@ -317,7 +359,9 @@ function Timeline({ match }) {
                 className="match-detail-list-row"
                 key={`${penalty?.player?.id || "penalty"}-${index}`}
               >
-                <strong>{penalty?.player?.name}</strong>
+                <strong>
+                  <PlayerName player={penalty?.player} />
+                </strong>
                 <span className="muted-text">
                   {[
                     penalty?.team?.name,
@@ -355,7 +399,7 @@ function PlayerList({ title, players }) {
           >
             <strong>
               {player?.shirtNumber != null ? `${player.shirtNumber}. ` : ""}
-              {player?.name}
+              <PlayerName player={player} />
             </strong>
             {player?.position && (
               <span className="muted-text">
