@@ -92,9 +92,12 @@ function formatScore(score) {
 
 function PlayerName({ player, fallback = NOT_AVAILABLE }) {
   const name = player?.name || fallback;
-  const hasValidId = /^[1-9]\d*$/.test(String(player?.id || ""));
+  const hasId =
+    player?.id !== null &&
+    player?.id !== undefined &&
+    String(player.id).trim() !== "";
 
-  return hasValidId ? (
+  return hasId ? (
     <Link href={`/persons/${player.id}`} className="player-detail-link">
       {name}
     </Link>

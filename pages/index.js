@@ -41,9 +41,8 @@ function StatusChip({ status }) {
 }
 
 function MatchCard({ match }) {
-  return (
-    <Link href={`/matches/${match.id}`} className="match-card-link">
-      <article className="match-card">
+  const card = (
+    <article className="match-card">
         <span className="eyebrow">
           {formatMatchStage(match.group || match.stage)}
         </span>
@@ -91,8 +90,21 @@ function MatchCard({ match }) {
             {formatMatchDateTime(match.utcDate)}
           </Typography>
         </Box>
-      </article>
+    </article>
+  );
+
+  return match.id ? (
+    <Link
+      href={`/matches/${match.id}`}
+      className="match-card-link"
+      aria-label={`${match.homeTeam || "Home team"} vs ${
+        match.awayTeam || "Away team"
+      } match details`}
+    >
+      {card}
     </Link>
+  ) : (
+    card
   );
 }
 
@@ -107,8 +119,11 @@ function MatchSection({ title, matches, emptyMessage }) {
         </div>
       ) : (
         <div className="match-grid">
-          {matches.map((match) => (
-            <MatchCard key={match.id} match={match} />
+          {matches.map((match, index) => (
+            <MatchCard
+              key={match.id || `${match.homeTeam}-${match.awayTeam}-${index}`}
+              match={match}
+            />
           ))}
         </div>
       )}

@@ -8,6 +8,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import Link from "next/link";
 import SEO from "../components/SEO";
 import styles from "../styles/Home.module.css";
 import { getWorldCupScorers } from "../lib/footballData";
@@ -59,7 +60,16 @@ const Scorers = ({ scorers }) => {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>
                       <Typography sx={{ fontWeight: 900 }}>
-                        {scorer.playerName || "Unknown Player"}
+                        {scorer.playerId ? (
+                          <Link
+                            href={`/persons/${scorer.playerId}`}
+                            className="player-detail-link"
+                          >
+                            {scorer.playerName || "Unknown Player"}
+                          </Link>
+                        ) : (
+                          scorer.playerName || "Unknown Player"
+                        )}
                       </Typography>
                     </TableCell>
                     <TableCell>

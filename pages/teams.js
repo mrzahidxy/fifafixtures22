@@ -55,9 +55,8 @@ function isUpcomingMatch(match, now = Date.now()) {
 }
 
 function TeamMatchCard({ match }) {
-  return (
-    <Link href={`/matches/${match.id}`} className="match-card-link">
-      <article className="match-card">
+  const card = (
+    <article className="match-card">
         <span className="eyebrow">
           {formatMatchStage(match.group || match.stage)}
         </span>
@@ -114,8 +113,21 @@ function TeamMatchCard({ match }) {
             {formatMatchDateTime(match.utcDate)}
           </Typography>
         </Box>
-      </article>
+    </article>
+  );
+
+  return match.id ? (
+    <Link
+      href={`/matches/${match.id}`}
+      className="match-card-link"
+      aria-label={`${match.homeTeam || "Home team"} vs ${
+        match.awayTeam || "Away team"
+      } match details`}
+    >
+      {card}
     </Link>
+  ) : (
+    card
   );
 }
 
@@ -379,8 +391,14 @@ const Teams = ({
               </div>
             ) : (
               <div className="match-grid">
-                {upcomingTeamMatches.map((match) => (
-                  <TeamMatchCard key={match.id} match={match} />
+                {upcomingTeamMatches.map((match, index) => (
+                  <TeamMatchCard
+                    key={
+                      match.id ||
+                      `${match.homeTeam}-${match.awayTeam}-${index}`
+                    }
+                    match={match}
+                  />
                 ))}
               </div>
             )}
@@ -394,8 +412,14 @@ const Teams = ({
               </div>
             ) : (
               <div className="match-grid">
-                {recentTeamResults.map((match) => (
-                  <TeamMatchCard key={match.id} match={match} />
+                {recentTeamResults.map((match, index) => (
+                  <TeamMatchCard
+                    key={
+                      match.id ||
+                      `${match.homeTeam}-${match.awayTeam}-${index}`
+                    }
+                    match={match}
+                  />
                 ))}
               </div>
             )}
@@ -425,7 +449,16 @@ const Teams = ({
                       >
                         <TableCell>
                           <Typography sx={{ fontWeight: 900 }}>
-                            {displayValue(player.name)}
+                            {player.id ? (
+                              <Link
+                                href={`/persons/${player.id}`}
+                                className="player-detail-link"
+                              >
+                                {displayValue(player.name)}
+                              </Link>
+                            ) : (
+                              displayValue(player.name)
+                            )}
                           </Typography>
                         </TableCell>
                         <TableCell>{displayValue(player.position)}</TableCell>
