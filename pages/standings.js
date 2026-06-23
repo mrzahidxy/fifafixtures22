@@ -8,11 +8,13 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import Link from "next/link";
 import SEO from "../components/SEO";
+import PageState from "../components/PageState";
 import styles from "../styles/Home.module.css";
 import { getWorldCupStandings } from "../lib/footballData";
 
-const Standings = ({ standings }) => {
+const Standings = ({ standings, dataError }) => {
   return (
     <>
       <SEO
@@ -31,31 +33,54 @@ const Standings = ({ standings }) => {
           </p>
         </header>
 
-        {standings.length === 0 ? (
-          <div className="empty-state">
-            <strong>No standings data available yet.</strong>
-            Group tables will appear when football-data.org provides them.
-          </div>
+        {dataError ? (
+          <PageState
+            type="error"
+            title="Standings could not be loaded."
+            message={dataError}
+            actionLabel="Try again"
+            onAction={() => window.location.reload()}
+          />
+        ) : standings.length === 0 ? (
+          <PageState
+            title="No standings data available yet."
+            message="Group tables will appear when football-data.org provides them."
+          />
         ) : (
           standings.map((standing, standingIndex) => (
-            <section
-              className="table-card"
-              key={`${standing.groupName}-${standingIndex}`}
-              style={{ marginBottom: "22px" }}
-            >
-              <Box sx={{ padding: "18px 18px 0" }}>
+            <div key={`${standing.groupName}-${standingIndex}`}>
+              <p className="table-scroll-hint">
+                Swipe horizontally to view all columns.
+              </p>
+              <section
+                className="table-card"
+                style={{ marginBottom: "22px" }}
+                tabIndex={0}
+                aria-label={`Scrollable ${
+                  standing.groupName || "group"
+                } standings table`}
+              >
+                <Box sx={{ padding: "18px 18px 0" }}>
                 <Typography
                   variant="h6"
                   sx={{ color: "var(--color-gold)", fontWeight: 900 }}
                 >
                   {standing.groupName || "Standings"}
                 </Typography>
-              </Box>
+                </Box>
 
-              <Table
-                className="dark-table standings-table"
-                aria-label={`${standing.groupName} standings`}
-              >
+                {!standing.table?.length ? (
+                  <PageState
+                    title={`No rows available for ${
+                      standing.groupName || "this group"
+                    }.`}
+                    message="Standings will appear when the table is published."
+                  />
+                ) : (
+                <Table
+                  className="dark-table standings-table"
+                  aria-label={`${standing.groupName || "Group"} standings`}
+                >
                 <TableHead>
                   <TableRow>
                     <TableCell>Pos</TableCell>
@@ -76,7 +101,7 @@ const Standings = ({ standings }) => {
                       key={`${standing.groupName}-${row.teamId || rowIndex}`}
                       sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                     >
-                      <TableCell>{row.position}</TableCell>
+                      <TableCell>{row.position ?? "—"}</TableCell>
                       <TableCell>
                         <Box
                           sx={{
@@ -98,25 +123,36 @@ const Standings = ({ standings }) => {
                             />
                           )}
                           <Typography sx={{ fontWeight: 800 }}>
-                            {row.teamName || "TBD"}
+                            {row.teamId ? (
+                              <Link
+                                href={`/teams/${row.teamId}`}
+                                className="team-detail-link"
+                              >
+                                {row.teamName || "TBD"}
+                              </Link>
+                            ) : (
+                              row.teamName || "TBD"
+                            )}
                           </Typography>
                         </Box>
                       </TableCell>
-                      <TableCell>{row.playedGames}</TableCell>
-                      <TableCell>{row.won}</TableCell>
-                      <TableCell>{row.draw}</TableCell>
-                      <TableCell>{row.lost}</TableCell>
-                      <TableCell>{row.goalsFor}</TableCell>
-                      <TableCell>{row.goalsAgainst}</TableCell>
-                      <TableCell>{row.goalDifference}</TableCell>
+                      <TableCell>{row.playedGames ?? "—"}</TableCell>
+                      <TableCell>{row.won ?? "—"}</TableCell>
+                      <TableCell>{row.draw ?? "—"}</TableCell>
+                      <TableCell>{row.lost ?? "—"}</TableCell>
+                      <TableCell>{row.goalsFor ?? "—"}</TableCell>
+                      <TableCell>{row.goalsAgainst ?? "—"}</TableCell>
+                      <TableCell>{row.goalDifference ?? "—"}</TableCell>
                       <TableCell sx={{ color: "var(--color-gold)", fontWeight: 900 }}>
-                        {row.points}
+                        {row.points ?? "—"}
                       </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
-            </section>
+                </Table>
+                )}
+              </section>
+            </div>
           ))
         )}
       </main>
@@ -141,13 +177,16 @@ export async function getServerSideProps() {
     const standings = await getWorldCupStandings();
 
     return {
-      props: { standings },
+      props: { standings, dataError: null },
     };
   } catch (error) {
     console.error(error);
 
     return {
-      props: { standings: [] },
+      props: {
+        standings: [],
+        dataError: "Please check your connection and try again.",
+      },
     };
   }
 }

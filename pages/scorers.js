@@ -8,11 +8,13 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import Link from "next/link";
 import SEO from "../components/SEO";
+import PageState from "../components/PageState";
 import styles from "../styles/Home.module.css";
 import { getWorldCupScorers } from "../lib/footballData";
 
-const Scorers = ({ scorers }) => {
+const Scorers = ({ scorers, dataError }) => {
   return (
     <>
       <SEO
@@ -31,14 +33,30 @@ const Scorers = ({ scorers }) => {
           </p>
         </header>
 
-        {scorers.length === 0 ? (
-          <div className="empty-state">
-            <strong>No scorer data available yet.</strong>
-            Top scorers will appear after matches are played.
-          </div>
+        {dataError ? (
+          <PageState
+            type="error"
+            title="Top scorers could not be loaded."
+            message={dataError}
+            actionLabel="Try again"
+            onAction={() => window.location.reload()}
+          />
+        ) : scorers.length === 0 ? (
+          <PageState
+            title="No scorer data available yet."
+            message="Top scorers will appear after matches are played."
+          />
         ) : (
-          <Box className="table-card">
-            <Table className="dark-table" aria-label="World Cup top scorers">
+          <>
+            <p className="table-scroll-hint">
+              Swipe horizontally to view all columns.
+            </p>
+            <Box
+              className="table-card"
+              tabIndex={0}
+              aria-label="Scrollable World Cup top scorers table"
+            >
+              <Table className="dark-table" aria-label="World Cup top scorers">
               <TableHead>
                 <TableRow>
                   <TableCell>Rank</TableCell>
@@ -59,7 +77,16 @@ const Scorers = ({ scorers }) => {
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>
                       <Typography sx={{ fontWeight: 900 }}>
-                        {scorer.playerName || "Unknown Player"}
+                        {scorer.playerId ? (
+                          <Link
+                            href={`/persons/${scorer.playerId}`}
+                            className="player-detail-link"
+                          >
+                            {scorer.playerName || "Unknown Player"}
+                          </Link>
+                        ) : (
+                          scorer.playerName || "Unknown Player"
+                        )}
                       </Typography>
                     </TableCell>
                     <TableCell>
@@ -82,7 +109,16 @@ const Scorers = ({ scorers }) => {
                             }}
                           />
                         )}
-                        {scorer.teamName || "TBD"}
+                        {scorer.teamId ? (
+                          <Link
+                            href={`/teams/${scorer.teamId}`}
+                            className="team-detail-link"
+                          >
+                            {scorer.teamName || "TBD"}
+                          </Link>
+                        ) : (
+                          scorer.teamName || "TBD"
+                        )}
                       </Box>
                     </TableCell>
                     <TableCell>{scorer.playerNationality || "Unknown"}</TableCell>
@@ -94,8 +130,9 @@ const Scorers = ({ scorers }) => {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
-          </Box>
+              </Table>
+            </Box>
+          </>
         )}
       </main>
 
@@ -119,13 +156,16 @@ export async function getServerSideProps() {
     const scorers = await getWorldCupScorers();
 
     return {
-      props: { scorers },
+      props: { scorers, dataError: null },
     };
   } catch (error) {
     console.error(error);
 
     return {
-      props: { scorers: [] },
+      props: {
+        scorers: [],
+        dataError: "Please check your connection and try again.",
+      },
     };
   }
 }

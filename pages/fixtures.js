@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from "next/link";
 import {
   Avatar,
   Box,
@@ -15,6 +16,7 @@ import {
   Typography,
 } from "@mui/material";
 import SEO from "../components/SEO";
+import PageState from "../components/PageState";
 import styles from "../styles/Home.module.css";
 import { getWorldCupMatches } from "../lib/footballData";
 import {
@@ -52,22 +54,29 @@ const statusFilterGroups = {
   SCHEDULED: ["SCHEDULED", "TIMED"],
 };
 
-const Fixtures = ({ fixtures }) => {
+const Fixtures = ({ fixtures, dataError }) => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [stageFilter, setStageFilter] = useState("All");
   const stageOptions = [
     "All",
     ...new Set(fixtures.map((fixture) => fixture.stage).filter(Boolean)),
   ];
-  const filteredFixtures = fixtures.filter((fixture) => {
-    const statusMatches =
-      statusFilterGroups[statusFilter] || [statusFilter];
-    const matchesStatus =
-      statusFilter === "All" || statusMatches.includes(fixture.status);
-    const matchesStage = stageFilter === "All" || fixture.stage === stageFilter;
+  const filteredFixtures = fixtures
+    .filter((fixture) => {
+      const statusMatches =
+        statusFilterGroups[statusFilter] || [statusFilter];
+      const matchesStatus =
+        statusFilter === "All" || statusMatches.includes(fixture.status);
+      const matchesStage =
+        stageFilter === "All" || fixture.stage === stageFilter;
 
-    return matchesStatus && matchesStage;
-  });
+      return matchesStatus && matchesStage;
+    })
+    .sort(
+      (firstFixture, secondFixture) =>
+        Number(firstFixture.status === "FINISHED") -
+        Number(secondFixture.status === "FINISHED")
+    );
 
   return (
     <>
@@ -119,14 +128,30 @@ const Fixtures = ({ fixtures }) => {
           </FormControl>
         </section>
 
-        {filteredFixtures.length === 0 ? (
-          <div className="empty-state">
-            <strong>No matches found for the selected filters.</strong>
-            Try a different status or stage.
-          </div>
+        {dataError ? (
+          <PageState
+            type="error"
+            title="Fixtures could not be loaded."
+            message={dataError}
+            actionLabel="Try again"
+            onAction={() => window.location.reload()}
+          />
+        ) : filteredFixtures.length === 0 ? (
+          <PageState
+            title="No matches found for the selected filters."
+            message="Try a different status or stage."
+          />
         ) : (
-          <Box className="table-card">
-            <Table className="dark-table" aria-label="fixtures table">
+          <>
+            <p className="table-scroll-hint">
+              Swipe horizontally to view all columns.
+            </p>
+            <Box
+              className="table-card"
+              tabIndex={0}
+              aria-label="Scrollable fixtures table"
+            >
+              <Table className="dark-table" aria-label="fixtures table">
               <TableHead>
                 <TableRow>
                   <TableCell>Match</TableCell>
@@ -139,39 +164,82 @@ const Fixtures = ({ fixtures }) => {
               <TableBody>
                 {filteredFixtures.map((fixture) => (
                   <TableRow
-                    key={fixture.id}
+                    key={
+                      fixture.id ||
+                      `${fixture.homeTeam}-${fixture.awayTeam}-${fixture.utcDate}`
+                    }
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell>
-                      <Box className="fixture-table-match">
-                        <Box className="fixture-table-team">
-                          {fixture.homeTeamCrest && (
-                            <Avatar
-                              src={fixture.homeTeamCrest}
-                              alt={`${fixture.homeTeam || "Home team"} flag`}
-                              className="fixture-table-flag"
-                              sx={{ background: "rgba(232, 237, 245, 0.9)" }}
-                            />
-                          )}
-                          <Typography sx={{ fontWeight: 800 }}>
-                            {fixture.homeTeam || "TBD"}
-                          </Typography>
+                      {fixture.id ? (
+                        <Link
+                          href={`/matches/${fixture.id}`}
+                          className="fixture-table-link"
+                          aria-label={`${fixture.homeTeam || "Home team"} vs ${
+                            fixture.awayTeam || "Away team"
+                          } match details`}
+                        >
+                          <Box className="fixture-table-match">
+                            <Box className="fixture-table-team">
+                              {fixture.homeTeamCrest && (
+                                <Avatar
+                                  src={fixture.homeTeamCrest}
+                                  alt={`${fixture.homeTeam || "Home team"} flag`}
+                                  className="fixture-table-flag"
+                                  sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+                                />
+                              )}
+                              <Typography sx={{ fontWeight: 800 }}>
+                                {fixture.homeTeam || "TBD"}
+                              </Typography>
+                            </Box>
+                            <span className="fixture-table-versus">VS</span>
+                            <Box className="fixture-table-team">
+                              {fixture.awayTeamCrest && (
+                                <Avatar
+                                  src={fixture.awayTeamCrest}
+                                  alt={`${fixture.awayTeam || "Away team"} flag`}
+                                  className="fixture-table-flag"
+                                  sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+                                />
+                              )}
+                              <Typography sx={{ fontWeight: 800 }}>
+                                {fixture.awayTeam || "TBD"}
+                              </Typography>
+                            </Box>
+                          </Box>
+                        </Link>
+                      ) : (
+                        <Box className="fixture-table-match">
+                          <Box className="fixture-table-team">
+                            {fixture.homeTeamCrest && (
+                              <Avatar
+                                src={fixture.homeTeamCrest}
+                                alt={`${fixture.homeTeam || "Home team"} flag`}
+                                className="fixture-table-flag"
+                                sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+                              />
+                            )}
+                            <Typography sx={{ fontWeight: 800 }}>
+                              {fixture.homeTeam || "TBD"}
+                            </Typography>
+                          </Box>
+                          <span className="fixture-table-versus">VS</span>
+                          <Box className="fixture-table-team">
+                            {fixture.awayTeamCrest && (
+                              <Avatar
+                                src={fixture.awayTeamCrest}
+                                alt={`${fixture.awayTeam || "Away team"} flag`}
+                                className="fixture-table-flag"
+                                sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+                              />
+                            )}
+                            <Typography sx={{ fontWeight: 800 }}>
+                              {fixture.awayTeam || "TBD"}
+                            </Typography>
+                          </Box>
                         </Box>
-                        <span className="fixture-table-versus">VS</span>
-                        <Box className="fixture-table-team">
-                          {fixture.awayTeamCrest && (
-                            <Avatar
-                              src={fixture.awayTeamCrest}
-                              alt={`${fixture.awayTeam || "Away team"} flag`}
-                              className="fixture-table-flag"
-                              sx={{ background: "rgba(232, 237, 245, 0.9)" }}
-                            />
-                          )}
-                          <Typography sx={{ fontWeight: 800 }}>
-                            {fixture.awayTeam || "TBD"}
-                          </Typography>
-                        </Box>
-                      </Box>
+                      )}
                     </TableCell>
                     <TableCell>
                       {formatMatchStage(fixture.group || fixture.stage)}
@@ -186,8 +254,9 @@ const Fixtures = ({ fixtures }) => {
                   </TableRow>
                 ))}
               </TableBody>
-            </Table>
-          </Box>
+              </Table>
+            </Box>
+          </>
         )}
       </main>
 
@@ -211,13 +280,16 @@ export async function getServerSideProps() {
     const fixtures = await getWorldCupMatches();
 
     return {
-      props: { fixtures },
+      props: { fixtures, dataError: null },
     };
   } catch (error) {
     console.error(error);
 
     return {
-      props: { fixtures: [] },
+      props: {
+        fixtures: [],
+        dataError: "Please check your connection and try again.",
+      },
     };
   }
 }

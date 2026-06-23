@@ -5,8 +5,9 @@ import {
   Typography,
 } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import Link from "next/link";
 import SEO from "../components/SEO";
-import { usePreferredTeam } from "../components/PreferredTeamContext";
+import PageState from "../components/PageState";
 import styles from "../styles/Home.module.css";
 import { getWorldCupMatches } from "../lib/footballData";
 import {
@@ -41,56 +42,70 @@ function StatusChip({ status }) {
 }
 
 function MatchCard({ match }) {
-  return (
+  const card = (
     <article className="match-card">
-      <span className="eyebrow">
-        {formatMatchStage(match.group || match.stage)}
-      </span>
-      <div className="match-teams">
-        <div className="match-team">
-          {match.homeTeamCrest && (
-            <Avatar
-              src={match.homeTeamCrest}
-              alt={`${match.homeTeam || "Home team"} flag`}
-              className="match-team-flag"
-              sx={{ background: "rgba(232, 237, 245, 0.9)" }}
-            />
-          )}
-          <span>{match.homeTeam || "TBD"}</span>
+        <span className="eyebrow">
+          {formatMatchStage(match.group || match.stage)}
+        </span>
+        <div className="match-teams">
+          <div className="match-team">
+            {match.homeTeamCrest && (
+              <Avatar
+                src={match.homeTeamCrest}
+                alt={`${match.homeTeam || "Home team"} flag`}
+                className="match-team-flag"
+                sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+              />
+            )}
+            <span>{match.homeTeam || "TBD"}</span>
+          </div>
+          <span className="match-versus">VS</span>
+          <div className="match-team">
+            {match.awayTeamCrest && (
+              <Avatar
+                src={match.awayTeamCrest}
+                alt={`${match.awayTeam || "Away team"} flag`}
+                className="match-team-flag"
+                sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+              />
+            )}
+            <span>{match.awayTeam || "TBD"}</span>
+          </div>
         </div>
-        <span className="match-versus">VS</span>
-        <div className="match-team">
-          {match.awayTeamCrest && (
-            <Avatar
-              src={match.awayTeamCrest}
-              alt={`${match.awayTeam || "Away team"} flag`}
-              className="match-team-flag"
-              sx={{ background: "rgba(232, 237, 245, 0.9)" }}
-            />
-          )}
-          <span>{match.awayTeam || "TBD"}</span>
-        </div>
-      </div>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          flexWrap: "wrap",
-        }}
-      >
-        <StatusChip status={match.status} />
-        <Typography className="score-text">
-          {formatMatchScore(match.homeScore, match.awayScore)}
-        </Typography>
-      </Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <AccessTimeIcon sx={{ color: "var(--color-gold)", fontSize: 18 }} />
-        <Typography className="muted-text">
-          {formatMatchDateTime(match.utcDate)}
-        </Typography>
-      </Box>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          <StatusChip status={match.status} />
+          <Typography className="score-text">
+            {formatMatchScore(match.homeScore, match.awayScore)}
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <AccessTimeIcon sx={{ color: "var(--color-gold)", fontSize: 18 }} />
+          <Typography className="muted-text">
+            {formatMatchDateTime(match.utcDate)}
+          </Typography>
+        </Box>
     </article>
+  );
+
+  return match.id ? (
+    <Link
+      href={`/matches/${match.id}`}
+      className="match-card-link"
+      aria-label={`${match.homeTeam || "Home team"} vs ${
+        match.awayTeam || "Away team"
+      } match details`}
+    >
+      {card}
+    </Link>
+  ) : (
+    card
   );
 }
 
@@ -99,14 +114,17 @@ function MatchSection({ title, matches, emptyMessage }) {
     <section>
       <h2 className="section-title">{title}</h2>
       {matches.length === 0 ? (
-        <div className="empty-state">
-          <strong>{emptyMessage}</strong>
-          Match information will appear here when available.
-        </div>
+        <PageState
+          title={emptyMessage}
+          message="Match information will appear here when available."
+        />
       ) : (
         <div className="match-grid">
-          {matches.map((match) => (
-            <MatchCard key={match.id} match={match} />
+          {matches.map((match, index) => (
+            <MatchCard
+              key={match.id || `${match.homeTeam}-${match.awayTeam}-${index}`}
+              match={match}
+            />
           ))}
         </div>
       )}
@@ -114,22 +132,10 @@ function MatchSection({ title, matches, emptyMessage }) {
   );
 }
 
-export default function Home({ fixtures }) {
-  const { preferredTeam } = usePreferredTeam();
+export default function Home({ fixtures, dataError }) {
   const liveMatches = fixtures.filter((fixture) =>
     ["LIVE", "IN_PLAY", "PAUSED"].includes(fixture.status)
   );
-  const preferredTeamMatches = preferredTeam
-    ? fixtures
-        .filter(
-          ({ homeTeam, awayTeam }) =>
-            homeTeam === preferredTeam.name ||
-            awayTeam === preferredTeam.name ||
-            homeTeam === preferredTeam.shortName ||
-            awayTeam === preferredTeam.shortName
-        )
-        .sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate))
-    : [];
   const upcomingStatuses = ["SCHEDULED", "TIMED"];
   const upcomingMatches = fixtures
     .filter((fixture) => upcomingStatuses.includes(fixture.status))
@@ -159,28 +165,33 @@ export default function Home({ fixtures }) {
           </p>
         </section>
 
-        <MatchSection
-          title="Live Matches"
-          matches={liveMatches}
-          emptyMessage="No live matches right now."
-        />
-        {preferredTeam && (
-          <MatchSection
-            title={`Favourite Team: ${preferredTeam.name}`}
-            matches={preferredTeamMatches}
-            emptyMessage={`No matches available for ${preferredTeam.name}.`}
+        {dataError ? (
+          <PageState
+            type="error"
+            title="Matches could not be loaded."
+            message={dataError}
+            actionLabel="Try again"
+            onAction={() => window.location.reload()}
           />
+        ) : (
+          <>
+            <MatchSection
+              title="Live Matches"
+              matches={liveMatches}
+              emptyMessage="No live matches right now."
+            />
+            <MatchSection
+              title="Recent Results"
+              matches={recentResults}
+              emptyMessage="No recent results yet."
+            />
+            <MatchSection
+              title="Upcoming Matches"
+              matches={upcomingMatches}
+              emptyMessage="No upcoming matches right now."
+            />
+          </>
         )}
-        <MatchSection
-          title="Upcoming Matches"
-          matches={upcomingMatches}
-          emptyMessage="No upcoming matches right now."
-        />
-        <MatchSection
-          title="Recent Results"
-          matches={recentResults}
-          emptyMessage="No recent results yet."
-        />
       </main>
 
       <footer className={styles.footer}>
@@ -201,13 +212,16 @@ export async function getServerSideProps() {
     const fixtures = await getWorldCupMatches();
 
     return {
-      props: { fixtures },
+      props: { fixtures, dataError: null },
     };
   } catch (error) {
     console.error(error);
 
     return {
-      props: { fixtures: [] },
+      props: {
+        fixtures: [],
+        dataError: "Please check your connection and try again.",
+      },
     };
   }
 }
