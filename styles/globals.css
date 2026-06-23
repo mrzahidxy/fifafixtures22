@@ -670,6 +670,10 @@ img {
   color: var(--color-text) !important;
 }
 
+.MuiSelect-icon {
+  color: var(--color-text) !important;
+}
+
 .MuiInputLabel-root {
   color: var(--color-muted) !important;
 }

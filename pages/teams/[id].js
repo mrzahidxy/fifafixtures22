@@ -363,6 +363,12 @@ export default function TeamDetails() {
                     color: "var(--color-gold)",
                     borderColor: "var(--color-gold)",
                     fontWeight: 800,
+                    "&.Mui-disabled": {
+                      color: "var(--color-gold)",
+                      borderColor: "rgba(214, 168, 79, 0.5)",
+                      background: "rgba(214, 168, 79, 0.08)",
+                      opacity: 1,
+                    },
                   }}
                 >
                   {isPreferred ? "Favourite team" : "Set favourite"}
