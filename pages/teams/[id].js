@@ -459,7 +459,7 @@ export default function TeamDetails() {
                       Swipe horizontally to view all columns.
                     </p>
                     <Box
-                      className="table-card table-scroll"
+                      className="table-card"
                       tabIndex={0}
                       aria-label={`Scrollable ${
                         team.name || "team"

@@ -501,7 +501,7 @@ function Statistics({ match }) {
         <span className="eyebrow">Statistic</span>
         <strong>{displayValue(match?.awayTeam?.shortName || match?.awayTeam?.name)}</strong>
       </div>
-      <div className="match-detail-stat-list">
+      <div>
         {statisticFields
           .filter(
             ([, key]) =>

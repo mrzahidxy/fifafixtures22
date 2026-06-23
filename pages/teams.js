@@ -127,7 +127,7 @@ export default function Teams({ teams, dataError }) {
           )}
         </section>
 
-        <section className="filter-bar teams-filter-bar" aria-label="Find a team">
+        <section className="filter-bar" aria-label="Find a team">
           <Autocomplete
             options={teams}
             value={selectedTeam}
