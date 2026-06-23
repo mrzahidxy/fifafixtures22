@@ -337,6 +337,65 @@ img {
   margin-bottom: 18px;
 }
 
+.team-selection-summary {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 22px;
+}
+
+.teams-page-section {
+  margin-bottom: 24px;
+}
+
+.team-preview-fallback {
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  flex: 0 0 auto;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background: var(--color-soft-bg);
+  color: var(--color-gold);
+  font-size: 1.35rem;
+  font-weight: 900;
+}
+
+.team-preview-meta {
+  margin-top: 8px !important;
+  color: var(--color-muted);
+  font-size: 0.86rem !important;
+}
+
+.team-preview-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.team-preview-actions .MuiButton-contained {
+  background: var(--color-gold);
+  color: var(--color-bg);
+  font-weight: 800;
+}
+
+.team-preview-actions .MuiButton-contained:hover {
+  background: #efc66e;
+}
+
+.team-preview-actions .MuiButton-outlined {
+  color: var(--color-gold);
+  border-color: rgba(214, 168, 79, 0.58);
+  font-weight: 800;
+}
+
+.team-detail-anchor {
+  scroll-margin-top: 96px;
+}
+
 .team-detail-crest {
   width: 84px !important;
   height: 84px !important;
@@ -442,6 +501,55 @@ img {
   background:
     linear-gradient(135deg, rgba(214, 168, 79, 0.14), rgba(122, 23, 52, 0.08)),
     var(--color-card-bg);
+}
+
+.my-team-copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.my-team-cta {
+  flex: 0 0 auto;
+  padding: 8px 12px;
+  border-radius: 6px;
+  background: var(--color-gold);
+  color: var(--color-bg);
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.favourite-team-link {
+  display: block;
+  width: fit-content;
+  max-width: 100%;
+  margin-bottom: 18px;
+}
+
+.favourite-team-link .preferred-team-panel {
+  transition:
+    border-color 160ms ease,
+    background 160ms ease,
+    transform 160ms ease;
+}
+
+.favourite-team-link:hover .preferred-team-panel {
+  border-color: rgba(214, 168, 79, 0.58);
+  background:
+    linear-gradient(135deg, rgba(214, 168, 79, 0.2), rgba(122, 23, 52, 0.12)),
+    var(--color-card-bg);
+  transform: translateY(-1px);
+}
+
+.favourite-team-link:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+.favourite-team-empty {
+  margin-bottom: 18px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
 }
 
 .preferred-team-crest-wrap {
@@ -1049,6 +1157,27 @@ img {
     padding: 16px;
   }
 
+  .team-selection-summary {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 16px;
+  }
+
+  .team-preview-actions,
+  .team-preview-actions .MuiButton-root {
+    width: 100%;
+  }
+
+  .team-preview-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .team-preview-fallback {
+    width: 56px;
+    height: 56px;
+  }
+
   .team-detail-crest {
     width: 56px !important;
     height: 56px !important;
@@ -1124,6 +1253,17 @@ img {
   .preferred-team-panel {
     width: 100%;
     min-width: 0;
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .favourite-team-link {
+    width: 100%;
+  }
+
+  .my-team-cta {
+    width: 100%;
+    text-align: center;
   }
 
   .preferred-team-crest-wrap {

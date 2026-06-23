@@ -234,6 +234,27 @@ export default function TeamDetails() {
     return () => controller.abort();
   }, [router.isReady, teamId]);
 
+  useEffect(() => {
+    if (loading || !team || typeof window === "undefined") {
+      return;
+    }
+
+    const sectionId = window.location.hash.slice(1);
+
+    if (!["squad", "matches"].includes(sectionId)) {
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById(sectionId)?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [loading, router.asPath, team]);
+
   const teamMatches = useMemo(
     () =>
       fixtures.filter(
@@ -402,18 +423,20 @@ export default function TeamDetails() {
 
               <CompetitionList competitions={team.runningCompetitions} />
 
-              <MatchSection
-                title="Upcoming Matches"
-                matches={upcomingMatches}
-                emptyMessage="No upcoming matches for this team."
-              />
-              <MatchSection
-                title="Recent Results"
-                matches={recentMatches}
-                emptyMessage="No recent results for this team."
-              />
+              <div id="matches" className="team-detail-anchor">
+                <MatchSection
+                  title="Upcoming Matches"
+                  matches={upcomingMatches}
+                  emptyMessage="No upcoming matches for this team."
+                />
+                <MatchSection
+                  title="Recent Results"
+                  matches={recentMatches}
+                  emptyMessage="No recent results for this team."
+                />
+              </div>
 
-              <section>
+              <section id="squad" className="team-detail-anchor">
                 <h2 className="section-title">Squad</h2>
                 {!team.squad?.length ? (
                   <div className="empty-state">
