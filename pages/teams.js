@@ -15,6 +15,7 @@ import {
 } from "@mui/material";
 import StarIcon from "@mui/icons-material/Star";
 import SEO from "../components/SEO";
+import PageState from "../components/PageState";
 import { usePreferredTeam } from "../components/PreferredTeamContext";
 import styles from "../styles/Home.module.css";
 import { getWorldCupTeams } from "../lib/footballData";
@@ -25,7 +26,7 @@ function displayValue(value) {
     : value;
 }
 
-export default function Teams({ teams }) {
+export default function Teams({ teams, dataError }) {
   const { preferredTeam, setPreferredTeam } = usePreferredTeam();
   const [selectedTeamId, setSelectedTeamId] = useState(teams[0]?.id || "");
   const [teamToConfirm, setTeamToConfirm] = useState(null);
@@ -73,6 +74,16 @@ export default function Teams({ teams }) {
           </p>
         </header>
 
+        {dataError ? (
+          <PageState
+            type="error"
+            title="Teams could not be loaded."
+            message={dataError}
+            actionLabel="Try again"
+            onAction={() => window.location.reload()}
+          />
+        ) : (
+          <>
         <section className="teams-page-section" aria-labelledby="my-team-heading">
           <h2 className="section-title" id="my-team-heading">
             My Team
@@ -109,10 +120,10 @@ export default function Teams({ teams }) {
               </div>
             </Link>
           ) : (
-            <div className="empty-state favourite-team-empty">
-              <strong>No team saved yet.</strong>
-              Find a team below and choose Set as My Team.
-            </div>
+            <PageState
+              title="No team saved yet."
+              message="Find a team below and choose Set as My Team."
+            />
           )}
         </section>
 
@@ -173,6 +184,11 @@ export default function Teams({ teams }) {
                 fontWeight: 800,
               }}
               variant="outlined"
+              aria-label={
+                isMyTeam
+                  ? `${selectedTeam.name || "Selected team"} is your saved team`
+                  : `Set ${selectedTeam.name || "selected team"} as my team`
+              }
             />
           )}
         </section>
@@ -214,6 +230,7 @@ export default function Teams({ teams }) {
                   component={Link}
                   href={`/teams/${selectedTeam.id}`}
                   variant="contained"
+                  aria-label={`View ${selectedTeam.name || "team"} details`}
                 >
                   View Details
                 </Button>
@@ -221,6 +238,7 @@ export default function Teams({ teams }) {
                   component={Link}
                   href={`/teams/${selectedTeam.id}#squad`}
                   variant="outlined"
+                  aria-label={`View ${selectedTeam.name || "team"} squad`}
                 >
                   Squad
                 </Button>
@@ -228,6 +246,7 @@ export default function Teams({ teams }) {
                   component={Link}
                   href={`/teams/${selectedTeam.id}#matches`}
                   variant="outlined"
+                  aria-label={`View ${selectedTeam.name || "team"} matches`}
                 >
                   Matches
                 </Button>
@@ -235,10 +254,10 @@ export default function Teams({ teams }) {
             )}
           </section>
         ) : (
-          <div className="empty-state">
-            <strong>No team selected.</strong>
-            Search for a team to see its preview.
-          </div>
+          <PageState
+            title="No team selected."
+            message="Search for a team to see its preview."
+          />
         )}
 
         <Dialog
@@ -287,6 +306,8 @@ export default function Teams({ teams }) {
             </Button>
           </DialogActions>
         </Dialog>
+          </>
+        )}
       </main>
 
       <footer className={styles.footer}>
@@ -319,10 +340,15 @@ export async function getServerSideProps({ query }) {
   try {
     const teams = await getWorldCupTeams();
 
-    return { props: { teams } };
+    return { props: { teams, dataError: null } };
   } catch (error) {
     console.error(error);
 
-    return { props: { teams: [] } };
+    return {
+      props: {
+        teams: [],
+        dataError: "Please check your connection and try again.",
+      },
+    };
   }
 }

@@ -7,6 +7,7 @@ import {
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import Link from "next/link";
 import SEO from "../components/SEO";
+import PageState from "../components/PageState";
 import styles from "../styles/Home.module.css";
 import { getWorldCupMatches } from "../lib/footballData";
 import {
@@ -113,10 +114,10 @@ function MatchSection({ title, matches, emptyMessage }) {
     <section>
       <h2 className="section-title">{title}</h2>
       {matches.length === 0 ? (
-        <div className="empty-state">
-          <strong>{emptyMessage}</strong>
-          Match information will appear here when available.
-        </div>
+        <PageState
+          title={emptyMessage}
+          message="Match information will appear here when available."
+        />
       ) : (
         <div className="match-grid">
           {matches.map((match, index) => (
@@ -131,7 +132,7 @@ function MatchSection({ title, matches, emptyMessage }) {
   );
 }
 
-export default function Home({ fixtures }) {
+export default function Home({ fixtures, dataError }) {
   const liveMatches = fixtures.filter((fixture) =>
     ["LIVE", "IN_PLAY", "PAUSED"].includes(fixture.status)
   );
@@ -164,21 +165,33 @@ export default function Home({ fixtures }) {
           </p>
         </section>
 
-        <MatchSection
-          title="Live Matches"
-          matches={liveMatches}
-          emptyMessage="No live matches right now."
-        />
-        <MatchSection
-          title="Recent Results"
-          matches={recentResults}
-          emptyMessage="No recent results yet."
-        />
-        <MatchSection
-          title="Upcoming Matches"
-          matches={upcomingMatches}
-          emptyMessage="No upcoming matches right now."
-        />
+        {dataError ? (
+          <PageState
+            type="error"
+            title="Matches could not be loaded."
+            message={dataError}
+            actionLabel="Try again"
+            onAction={() => window.location.reload()}
+          />
+        ) : (
+          <>
+            <MatchSection
+              title="Live Matches"
+              matches={liveMatches}
+              emptyMessage="No live matches right now."
+            />
+            <MatchSection
+              title="Recent Results"
+              matches={recentResults}
+              emptyMessage="No recent results yet."
+            />
+            <MatchSection
+              title="Upcoming Matches"
+              matches={upcomingMatches}
+              emptyMessage="No upcoming matches right now."
+            />
+          </>
+        )}
       </main>
 
       <footer className={styles.footer}>
@@ -199,13 +212,16 @@ export async function getServerSideProps() {
     const fixtures = await getWorldCupMatches();
 
     return {
-      props: { fixtures },
+      props: { fixtures, dataError: null },
     };
   } catch (error) {
     console.error(error);
 
     return {
-      props: { fixtures: [] },
+      props: {
+        fixtures: [],
+        dataError: "Please check your connection and try again.",
+      },
     };
   }
 }

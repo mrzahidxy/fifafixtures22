@@ -4,12 +4,12 @@ import { useRouter } from "next/router";
 import {
   Avatar,
   Box,
-  CircularProgress,
   Paper,
   Typography,
 } from "@mui/material";
 import moment from "moment/moment";
 import SEO from "../../components/SEO";
+import PageState from "../../components/PageState";
 
 const NOT_AVAILABLE = "Not available";
 
@@ -93,11 +93,10 @@ function CompetitionList({ competitions }) {
       </h2>
 
       {!competitions?.length ? (
-        <div className="empty-state person-detail-empty">
-          <strong>No running competitions available.</strong>
-          Competition details were not included for this player&apos;s current
-          team.
-        </div>
+        <PageState
+          title="No running competitions available."
+          message="Competition details were not included for this player's current team."
+        />
       ) : (
         <div className="person-competition-grid">
           {competitions.map((competition, index) => (
@@ -296,6 +295,7 @@ export default function PersonDetails() {
   const [person, setPerson] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [notFound, setNotFound] = useState(false);
   const rawId = router.query.id;
   const personId = Array.isArray(rawId) ? rawId[0] : rawId;
 
@@ -315,6 +315,7 @@ export default function PersonDetails() {
     async function loadPerson() {
       setLoading(true);
       setError("");
+      setNotFound(false);
       setPerson(null);
 
       try {
@@ -322,6 +323,11 @@ export default function PersonDetails() {
           signal: controller.signal,
         });
         const data = await response.json().catch(() => null);
+
+        if (response.status === 404) {
+          setNotFound(true);
+          return;
+        }
 
         if (!response.ok) {
           throw new Error(
@@ -370,24 +376,32 @@ export default function PersonDetails() {
         </Link>
 
         {loading ? (
-          <div className="empty-state match-detail-loading">
-            <CircularProgress
-              size={32}
-              sx={{ color: "var(--color-gold)", marginBottom: "12px" }}
-            />
-            <strong>Loading player details…</strong>
-            Fetching the latest available player information.
-          </div>
+          <PageState
+            type="loading"
+            title="Loading player details..."
+            message="Fetching the latest available player information."
+          />
+        ) : notFound ? (
+          <PageState
+            type="not-found"
+            title="Player not found."
+            message="Check the player link or return to the fixtures page."
+            actionLabel="View fixtures"
+            actionHref="/fixtures"
+          />
         ) : error ? (
-          <div className="empty-state">
-            <strong>{error}</strong>
-            Check the player link or try again later.
-          </div>
+          <PageState
+            type="error"
+            title="Player details could not be loaded."
+            message={error}
+            actionLabel="Try again"
+            onAction={() => window.location.reload()}
+          />
         ) : !person ? (
-          <div className="empty-state">
-            <strong>No player details available.</strong>
-            Football-Data did not return information for this player.
-          </div>
+          <PageState
+            title="No player details available."
+            message="Football-Data did not return information for this player."
+          />
         ) : (
           <PlayerDetails person={person} />
         )}

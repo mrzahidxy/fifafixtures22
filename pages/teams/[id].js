@@ -6,7 +6,6 @@ import {
   Box,
   Button,
   Chip,
-  CircularProgress,
   Paper,
   Table,
   TableBody,
@@ -18,6 +17,7 @@ import {
 import StarIcon from "@mui/icons-material/Star";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import SEO from "../../components/SEO";
+import PageState from "../../components/PageState";
 import { usePreferredTeam } from "../../components/PreferredTeamContext";
 import {
   formatMatchDateTime,
@@ -110,10 +110,10 @@ function MatchSection({ title, matches, emptyMessage }) {
     <section>
       <h2 className="section-title">{title}</h2>
       {!matches.length ? (
-        <div className="empty-state">
-          <strong>{emptyMessage}</strong>
-          Match information will appear here when available.
-        </div>
+        <PageState
+          title={emptyMessage}
+          message="Match information will appear here when available."
+        />
       ) : (
         <div className="match-grid">
           {matches.map((match, index) => (
@@ -135,9 +135,10 @@ function CompetitionList({ competitions }) {
         Competitions
       </h2>
       {!competitions?.length ? (
-        <div className="empty-state person-detail-empty">
-          <strong>No competition data available.</strong>
-        </div>
+        <PageState
+          title="No competition data available."
+          message="Competition information was not included for this team."
+        />
       ) : (
         <div className="person-competition-grid">
           {competitions.map((competition, index) => (
@@ -292,28 +293,32 @@ export default function TeamDetails() {
         </Link>
 
         {loading ? (
-          <div className="empty-state match-detail-loading">
-            <CircularProgress
-              size={32}
-              sx={{ color: "var(--color-gold)", marginBottom: "12px" }}
-            />
-            <strong>Loading team details…</strong>
-            Fetching the latest available team information.
-          </div>
+          <PageState
+            type="loading"
+            title="Loading team details..."
+            message="Fetching the latest available team information."
+          />
         ) : notFound ? (
-          <div className="empty-state">
-            <strong>Team not found.</strong>
-            Check the team link or return to the teams page.
-          </div>
+          <PageState
+            type="not-found"
+            title="Team not found."
+            message="Check the team link or return to the teams page."
+            actionLabel="View teams"
+            actionHref="/teams"
+          />
         ) : error ? (
-          <div className="empty-state">
-            <strong>{error}</strong>
-            Try again later or return to the teams page.
-          </div>
+          <PageState
+            type="error"
+            title="Team details could not be loaded."
+            message={error}
+            actionLabel="Try again"
+            onAction={() => window.location.reload()}
+          />
         ) : !team ? (
-          <div className="empty-state">
-            <strong>No team details available.</strong>
-          </div>
+          <PageState
+            title="No team details available."
+            message="Football-Data did not return information for this team."
+          />
         ) : (
           <>
             <header className="page-header team-detail-header">
@@ -347,6 +352,11 @@ export default function TeamDetails() {
                       shortName: team.shortName,
                       crest: team.crest,
                     })
+                  }
+                  aria-label={
+                    isPreferred
+                      ? `${team.name || "This team"} is your favourite team`
+                      : `Set ${team.name || "this team"} as favourite`
                   }
                   sx={{
                     marginLeft: { md: "auto" },
@@ -439,11 +449,22 @@ export default function TeamDetails() {
               <section id="squad" className="team-detail-anchor">
                 <h2 className="section-title">Squad</h2>
                 {!team.squad?.length ? (
-                  <div className="empty-state">
-                    <strong>No squad data available.</strong>
-                  </div>
+                  <PageState
+                    title="No squad data available."
+                    message="Player information was not included for this team."
+                  />
                 ) : (
-                  <Box className="table-card table-scroll">
+                  <>
+                    <p className="table-scroll-hint">
+                      Swipe horizontally to view all columns.
+                    </p>
+                    <Box
+                      className="table-card table-scroll"
+                      tabIndex={0}
+                      aria-label={`Scrollable ${
+                        team.name || "team"
+                      } squad table`}
+                    >
                     <Table className="dark-table" aria-label={`${team.name} squad`}>
                       <TableHead>
                         <TableRow>
@@ -475,7 +496,8 @@ export default function TeamDetails() {
                         ))}
                       </TableBody>
                     </Table>
-                  </Box>
+                    </Box>
+                  </>
                 )}
               </section>
             </div>

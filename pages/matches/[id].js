@@ -5,7 +5,6 @@ import {
   Avatar,
   Box,
   Chip,
-  CircularProgress,
   Divider,
   Paper,
   Tab,
@@ -14,6 +13,7 @@ import {
 } from "@mui/material";
 import moment from "moment/moment";
 import SEO from "../../components/SEO";
+import PageState from "../../components/PageState";
 import {
   formatMatchDateTime,
   formatMatchStage,
@@ -107,14 +107,10 @@ function PlayerName({ player, fallback = NOT_AVAILABLE }) {
 }
 
 function DetailItem({ label, value }) {
-  if (!hasValue(value)) {
-    return null;
-  }
-
   return (
     <div className="match-detail-item">
       <span className="eyebrow">{label}</span>
-      <strong>{value}</strong>
+      <strong>{displayValue(value)}</strong>
     </div>
   );
 }
@@ -627,6 +623,7 @@ export default function MatchDetails() {
   const [match, setMatch] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [notFound, setNotFound] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const rawId = router.query.id;
   const matchId = Array.isArray(rawId) ? rawId[0] : rawId;
@@ -669,6 +666,7 @@ export default function MatchDetails() {
     async function loadMatch() {
       setLoading(true);
       setError("");
+      setNotFound(false);
       setMatch(null);
       setActiveTab(0);
 
@@ -677,6 +675,11 @@ export default function MatchDetails() {
           signal: controller.signal,
         });
         const data = await response.json().catch(() => null);
+
+        if (response.status === 404) {
+          setNotFound(true);
+          return;
+        }
 
         if (!response.ok) {
           throw new Error(
@@ -727,24 +730,32 @@ export default function MatchDetails() {
         </Link>
 
         {loading ? (
-          <div className="empty-state match-detail-loading">
-            <CircularProgress
-              size={32}
-              sx={{ color: "var(--color-gold)", marginBottom: "12px" }}
-            />
-            <strong>Loading match details…</strong>
-            Fetching the latest available match information.
-          </div>
+          <PageState
+            type="loading"
+            title="Loading match details..."
+            message="Fetching the latest available match information."
+          />
+        ) : notFound ? (
+          <PageState
+            type="not-found"
+            title="Match not found."
+            message="Check the match link or return to the fixtures page."
+            actionLabel="View fixtures"
+            actionHref="/fixtures"
+          />
         ) : error ? (
-          <div className="empty-state">
-            <strong>{error}</strong>
-            Check the match link or try again later.
-          </div>
+          <PageState
+            type="error"
+            title="Match details could not be loaded."
+            message={error}
+            actionLabel="Try again"
+            onAction={() => window.location.reload()}
+          />
         ) : !match ? (
-          <div className="empty-state">
-            <strong>No match details available.</strong>
-            Football-Data did not return information for this match.
-          </div>
+          <PageState
+            title="No match details available."
+            message="Football-Data did not return information for this match."
+          />
         ) : (
           <>
             <MatchHeader match={match} />
