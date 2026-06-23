@@ -188,7 +188,18 @@ function PlayerDetails({ person }) {
               sx={{ background: "rgba(232, 237, 245, 0.9)" }}
             />
             <div className="match-detail-meta-grid">
-              <DetailItem label="Name" value={team?.name} />
+              <DetailItem label="Name">
+                {team?.id ? (
+                  <Link
+                    href={`/teams/${team.id}`}
+                    className="team-detail-link"
+                  >
+                    {displayValue(team?.name)}
+                  </Link>
+                ) : (
+                  displayValue(team?.name)
+                )}
+              </DetailItem>
               <DetailItem label="Short name" value={team?.shortName} />
               <DetailItem label="TLA" value={team?.tla} />
               <DetailItem label="Venue" value={team?.venue} />

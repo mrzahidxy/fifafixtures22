@@ -92,7 +92,16 @@ const Scorers = ({ scorers }) => {
                             }}
                           />
                         )}
-                        {scorer.teamName || "TBD"}
+                        {scorer.teamId ? (
+                          <Link
+                            href={`/teams/${scorer.teamId}`}
+                            className="team-detail-link"
+                          >
+                            {scorer.teamName || "TBD"}
+                          </Link>
+                        ) : (
+                          scorer.teamName || "TBD"
+                        )}
                       </Box>
                     </TableCell>
                     <TableCell>{scorer.playerNationality || "Unknown"}</TableCell>

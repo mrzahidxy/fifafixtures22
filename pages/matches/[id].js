@@ -134,7 +134,16 @@ function TeamSummary({ team, side }) {
         <Box>
           <Typography className="eyebrow">{side}</Typography>
           <Typography component="h2" className="match-title">
-            {displayValue(team?.name)}
+            {team?.id ? (
+              <Link
+                href={`/teams/${team.id}`}
+                className="team-detail-link"
+              >
+                {displayValue(team?.name)}
+              </Link>
+            ) : (
+              displayValue(team?.name)
+            )}
           </Typography>
           {team?.shortName && (
             <Typography className="muted-text">{team.shortName}</Typography>
@@ -554,7 +563,18 @@ function MatchHeader({ match }) {
             className="match-detail-score-crest"
             sx={{ background: "rgba(232, 237, 245, 0.9)" }}
           />
-          <strong>{displayValue(match?.homeTeam?.name)}</strong>
+          <strong>
+            {match?.homeTeam?.id ? (
+              <Link
+                href={`/teams/${match.homeTeam.id}`}
+                className="team-detail-link"
+              >
+                {displayValue(match?.homeTeam?.name)}
+              </Link>
+            ) : (
+              displayValue(match?.homeTeam?.name)
+            )}
+          </strong>
         </div>
         <div className="match-detail-score">
           <Chip
@@ -576,7 +596,18 @@ function MatchHeader({ match }) {
             className="match-detail-score-crest"
             sx={{ background: "rgba(232, 237, 245, 0.9)" }}
           />
-          <strong>{displayValue(match?.awayTeam?.name)}</strong>
+          <strong>
+            {match?.awayTeam?.id ? (
+              <Link
+                href={`/teams/${match.awayTeam.id}`}
+                className="team-detail-link"
+              >
+                {displayValue(match?.awayTeam?.name)}
+              </Link>
+            ) : (
+              displayValue(match?.awayTeam?.name)
+            )}
+          </strong>
         </div>
       </div>
       <Typography className="page-subtitle">

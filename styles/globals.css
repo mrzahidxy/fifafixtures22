@@ -872,7 +872,8 @@ img {
 }
 
 .player-detail-link,
-.person-detail-link {
+.person-detail-link,
+.team-detail-link {
   color: var(--color-gold);
   text-decoration: none;
   text-underline-offset: 3px;
@@ -880,16 +881,37 @@ img {
 
 .player-detail-link:hover,
 .person-detail-link:hover,
+.team-detail-link:hover,
 .player-detail-link:focus-visible,
-.person-detail-link:focus-visible {
+.person-detail-link:focus-visible,
+.team-detail-link:focus-visible {
   text-decoration: underline;
 }
 
 .player-detail-link:focus-visible,
-.person-detail-link:focus-visible {
+.person-detail-link:focus-visible,
+.team-detail-link:focus-visible {
   outline: 2px solid var(--color-gold);
   outline-offset: 2px;
   border-radius: 2px;
+}
+
+.team-detail-header {
+  background:
+    linear-gradient(135deg, rgba(122, 23, 52, 0.36), rgba(21, 28, 46, 0.94)),
+    radial-gradient(circle at top right, rgba(214, 168, 79, 0.12), transparent 24rem);
+}
+
+.team-detail-heading {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.team-detail-page-crest {
+  width: 96px !important;
+  height: 96px !important;
+  flex: 0 0 auto;
 }
 
 .person-detail-header {
@@ -1229,8 +1251,22 @@ img {
   }
 
   .person-detail-heading,
-  .person-team-summary {
+  .person-team-summary,
+  .team-detail-heading {
     align-items: flex-start;
+  }
+
+  .team-detail-heading {
+    flex-wrap: wrap;
+  }
+
+  .team-detail-heading .MuiButton-root {
+    margin-left: 0;
+  }
+
+  .team-detail-page-crest {
+    width: 72px !important;
+    height: 72px !important;
   }
 
   .person-detail-team-crest {

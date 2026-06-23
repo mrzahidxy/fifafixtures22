@@ -8,6 +8,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import Link from "next/link";
 import SEO from "../components/SEO";
 import styles from "../styles/Home.module.css";
 import { getWorldCupStandings } from "../lib/footballData";
@@ -98,7 +99,16 @@ const Standings = ({ standings }) => {
                             />
                           )}
                           <Typography sx={{ fontWeight: 800 }}>
-                            {row.teamName || "TBD"}
+                            {row.teamId ? (
+                              <Link
+                                href={`/teams/${row.teamId}`}
+                                className="team-detail-link"
+                              >
+                                {row.teamName || "TBD"}
+                              </Link>
+                            ) : (
+                              row.teamName || "TBD"
+                            )}
                           </Typography>
                         </Box>
                       </TableCell>

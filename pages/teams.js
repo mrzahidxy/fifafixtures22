@@ -178,12 +178,12 @@ const Teams = ({
       preferredTeam?.id &&
       String(preferredTeam.id) !== String(selectedTeamId)
     ) {
-      router.replace(`/teams?team=${preferredTeam.id}`);
+      router.replace(`/teams/${preferredTeam.id}`);
     }
   }, [hasSelectedTeamQuery, preferredTeam, router, selectedTeamId]);
 
   const handleTeamChange = (event) => {
-    router.push(`/teams?team=${event.target.value}`);
+    router.push(`/teams/${event.target.value}`);
   };
 
   const handleSetPreferredTeam = () => {
@@ -347,7 +347,16 @@ const Teams = ({
                   {displayValue(teamDetails.tla)}
                 </Typography>
                 <h3 className="match-title">
-                  {displayValue(teamDetails.name)}
+                  {teamDetails.id ? (
+                    <Link
+                      href={`/teams/${teamDetails.id}`}
+                      className="team-detail-link"
+                    >
+                      {displayValue(teamDetails.name)}
+                    </Link>
+                  ) : (
+                    displayValue(teamDetails.name)
+                  )}
                 </h3>
                 <Typography className="muted-text">
                   {displayValue(teamDetails.shortName)}
@@ -495,6 +504,26 @@ const Teams = ({
 export default Teams;
 
 export async function getServerSideProps({ query }) {
+  if (query.team) {
+    const teamId = Array.isArray(query.team) ? query.team[0] : query.team;
+
+    if (/^[1-9]\d*$/.test(String(teamId))) {
+      return {
+        redirect: {
+          destination: `/teams/${teamId}`,
+          permanent: false,
+        },
+      };
+    }
+
+    return {
+      redirect: {
+        destination: "/teams",
+        permanent: false,
+      },
+    };
+  }
+
   try {
     const [teams, fixtures] = await Promise.all([
       getWorldCupTeams(),
