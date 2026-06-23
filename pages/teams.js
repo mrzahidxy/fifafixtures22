@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
+import Link from "next/link";
 import {
   Avatar,
   Box,
@@ -55,64 +56,66 @@ function isUpcomingMatch(match, now = Date.now()) {
 
 function TeamMatchCard({ match }) {
   return (
-    <article className="match-card">
-      <span className="eyebrow">
-        {formatMatchStage(match.group || match.stage)}
-      </span>
-      <div className="match-teams">
-        <div className="match-team">
-          {match.homeTeamCrest && (
-            <Avatar
-              src={match.homeTeamCrest}
-              alt={`${match.homeTeam || "Home team"} flag`}
-              className="match-team-flag"
-              sx={{ background: "rgba(232, 237, 245, 0.9)" }}
-            />
-          )}
-          <span>{match.homeTeam || "TBD"}</span>
+    <Link href={`/matches/${match.id}`} className="match-card-link">
+      <article className="match-card">
+        <span className="eyebrow">
+          {formatMatchStage(match.group || match.stage)}
+        </span>
+        <div className="match-teams">
+          <div className="match-team">
+            {match.homeTeamCrest && (
+              <Avatar
+                src={match.homeTeamCrest}
+                alt={`${match.homeTeam || "Home team"} flag`}
+                className="match-team-flag"
+                sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+              />
+            )}
+            <span>{match.homeTeam || "TBD"}</span>
+          </div>
+          <span className="match-versus">VS</span>
+          <div className="match-team">
+            {match.awayTeamCrest && (
+              <Avatar
+                src={match.awayTeamCrest}
+                alt={`${match.awayTeam || "Away team"} flag`}
+                className="match-team-flag"
+                sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+              />
+            )}
+            <span>{match.awayTeam || "TBD"}</span>
+          </div>
         </div>
-        <span className="match-versus">VS</span>
-        <div className="match-team">
-          {match.awayTeamCrest && (
-            <Avatar
-              src={match.awayTeamCrest}
-              alt={`${match.awayTeam || "Away team"} flag`}
-              className="match-team-flag"
-              sx={{ background: "rgba(232, 237, 245, 0.9)" }}
-            />
-          )}
-          <span>{match.awayTeam || "TBD"}</span>
-        </div>
-      </div>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          flexWrap: "wrap",
-        }}
-      >
-        <Chip
-          size="small"
-          label={formatMatchStatus(match.status)}
+        <Box
           sx={{
-            color: "var(--color-gold)",
-            borderColor: "var(--color-gold)",
-            fontWeight: 700,
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
           }}
-          variant="outlined"
-        />
-        <Typography className="score-text">
-          {formatMatchScore(match.homeScore, match.awayScore)}
-        </Typography>
-      </Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <AccessTimeIcon sx={{ color: "var(--color-gold)", fontSize: 18 }} />
-        <Typography className="muted-text">
-          {formatMatchDateTime(match.utcDate)}
-        </Typography>
-      </Box>
-    </article>
+        >
+          <Chip
+            size="small"
+            label={formatMatchStatus(match.status)}
+            sx={{
+              color: "var(--color-gold)",
+              borderColor: "var(--color-gold)",
+              fontWeight: 700,
+            }}
+            variant="outlined"
+          />
+          <Typography className="score-text">
+            {formatMatchScore(match.homeScore, match.awayScore)}
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <AccessTimeIcon sx={{ color: "var(--color-gold)", fontSize: 18 }} />
+          <Typography className="muted-text">
+            {formatMatchDateTime(match.utcDate)}
+          </Typography>
+        </Box>
+      </article>
+    </Link>
   );
 }
 

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Link from "next/link";
 import {
   Avatar,
   Box,
@@ -143,35 +144,40 @@ const Fixtures = ({ fixtures }) => {
                     sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                   >
                     <TableCell>
-                      <Box className="fixture-table-match">
-                        <Box className="fixture-table-team">
-                          {fixture.homeTeamCrest && (
-                            <Avatar
-                              src={fixture.homeTeamCrest}
-                              alt={`${fixture.homeTeam || "Home team"} flag`}
-                              className="fixture-table-flag"
-                              sx={{ background: "rgba(232, 237, 245, 0.9)" }}
-                            />
-                          )}
-                          <Typography sx={{ fontWeight: 800 }}>
-                            {fixture.homeTeam || "TBD"}
-                          </Typography>
+                      <Link
+                        href={`/matches/${fixture.id}`}
+                        className="fixture-table-link"
+                      >
+                        <Box className="fixture-table-match">
+                          <Box className="fixture-table-team">
+                            {fixture.homeTeamCrest && (
+                              <Avatar
+                                src={fixture.homeTeamCrest}
+                                alt={`${fixture.homeTeam || "Home team"} flag`}
+                                className="fixture-table-flag"
+                                sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+                              />
+                            )}
+                            <Typography sx={{ fontWeight: 800 }}>
+                              {fixture.homeTeam || "TBD"}
+                            </Typography>
+                          </Box>
+                          <span className="fixture-table-versus">VS</span>
+                          <Box className="fixture-table-team">
+                            {fixture.awayTeamCrest && (
+                              <Avatar
+                                src={fixture.awayTeamCrest}
+                                alt={`${fixture.awayTeam || "Away team"} flag`}
+                                className="fixture-table-flag"
+                                sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+                              />
+                            )}
+                            <Typography sx={{ fontWeight: 800 }}>
+                              {fixture.awayTeam || "TBD"}
+                            </Typography>
+                          </Box>
                         </Box>
-                        <span className="fixture-table-versus">VS</span>
-                        <Box className="fixture-table-team">
-                          {fixture.awayTeamCrest && (
-                            <Avatar
-                              src={fixture.awayTeamCrest}
-                              alt={`${fixture.awayTeam || "Away team"} flag`}
-                              className="fixture-table-flag"
-                              sx={{ background: "rgba(232, 237, 245, 0.9)" }}
-                            />
-                          )}
-                          <Typography sx={{ fontWeight: 800 }}>
-                            {fixture.awayTeam || "TBD"}
-                          </Typography>
-                        </Box>
-                      </Box>
+                      </Link>
                     </TableCell>
                     <TableCell>
                       {formatMatchStage(fixture.group || fixture.stage)}

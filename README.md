@@ -49,7 +49,7 @@ Open `http://localhost:3000` in your browser.
 Required environment variable:
 
 ```bash
-FOOTBALL_DATA_API_TOKEN=your_api_token_here
+FOOTBALL_DATA_API_KEY=your_api_key_here
 NEXT_PUBLIC_SITE_URL=https://your-domain.com
 ```
 
@@ -101,7 +101,7 @@ The app fetches data server-side in each page using `getServerSideProps`. Phase 
 
 Base URL: `https://api.football-data.org/v4`
 
-`FOOTBALL_DATA_API_TOKEN` is required in `.env.local`. If the API is unavailable, pages show empty states instead of crashing.
+`FOOTBALL_DATA_API_KEY` is required in `.env.local`. If the API is unavailable, pages show empty states instead of crashing.
 
 ## Deployment
 

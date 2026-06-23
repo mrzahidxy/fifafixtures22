@@ -5,8 +5,8 @@ import {
   Typography,
 } from "@mui/material";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import Link from "next/link";
 import SEO from "../components/SEO";
-import { usePreferredTeam } from "../components/PreferredTeamContext";
 import styles from "../styles/Home.module.css";
 import { getWorldCupMatches } from "../lib/footballData";
 import {
@@ -42,55 +42,57 @@ function StatusChip({ status }) {
 
 function MatchCard({ match }) {
   return (
-    <article className="match-card">
-      <span className="eyebrow">
-        {formatMatchStage(match.group || match.stage)}
-      </span>
-      <div className="match-teams">
-        <div className="match-team">
-          {match.homeTeamCrest && (
-            <Avatar
-              src={match.homeTeamCrest}
-              alt={`${match.homeTeam || "Home team"} flag`}
-              className="match-team-flag"
-              sx={{ background: "rgba(232, 237, 245, 0.9)" }}
-            />
-          )}
-          <span>{match.homeTeam || "TBD"}</span>
+    <Link href={`/matches/${match.id}`} className="match-card-link">
+      <article className="match-card">
+        <span className="eyebrow">
+          {formatMatchStage(match.group || match.stage)}
+        </span>
+        <div className="match-teams">
+          <div className="match-team">
+            {match.homeTeamCrest && (
+              <Avatar
+                src={match.homeTeamCrest}
+                alt={`${match.homeTeam || "Home team"} flag`}
+                className="match-team-flag"
+                sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+              />
+            )}
+            <span>{match.homeTeam || "TBD"}</span>
+          </div>
+          <span className="match-versus">VS</span>
+          <div className="match-team">
+            {match.awayTeamCrest && (
+              <Avatar
+                src={match.awayTeamCrest}
+                alt={`${match.awayTeam || "Away team"} flag`}
+                className="match-team-flag"
+                sx={{ background: "rgba(232, 237, 245, 0.9)" }}
+              />
+            )}
+            <span>{match.awayTeam || "TBD"}</span>
+          </div>
         </div>
-        <span className="match-versus">VS</span>
-        <div className="match-team">
-          {match.awayTeamCrest && (
-            <Avatar
-              src={match.awayTeamCrest}
-              alt={`${match.awayTeam || "Away team"} flag`}
-              className="match-team-flag"
-              sx={{ background: "rgba(232, 237, 245, 0.9)" }}
-            />
-          )}
-          <span>{match.awayTeam || "TBD"}</span>
-        </div>
-      </div>
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: "10px",
-          flexWrap: "wrap",
-        }}
-      >
-        <StatusChip status={match.status} />
-        <Typography className="score-text">
-          {formatMatchScore(match.homeScore, match.awayScore)}
-        </Typography>
-      </Box>
-      <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <AccessTimeIcon sx={{ color: "var(--color-gold)", fontSize: 18 }} />
-        <Typography className="muted-text">
-          {formatMatchDateTime(match.utcDate)}
-        </Typography>
-      </Box>
-    </article>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            flexWrap: "wrap",
+          }}
+        >
+          <StatusChip status={match.status} />
+          <Typography className="score-text">
+            {formatMatchScore(match.homeScore, match.awayScore)}
+          </Typography>
+        </Box>
+        <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
+          <AccessTimeIcon sx={{ color: "var(--color-gold)", fontSize: 18 }} />
+          <Typography className="muted-text">
+            {formatMatchDateTime(match.utcDate)}
+          </Typography>
+        </Box>
+      </article>
+    </Link>
   );
 }
 
@@ -115,21 +117,9 @@ function MatchSection({ title, matches, emptyMessage }) {
 }
 
 export default function Home({ fixtures }) {
-  const { preferredTeam } = usePreferredTeam();
   const liveMatches = fixtures.filter((fixture) =>
     ["LIVE", "IN_PLAY", "PAUSED"].includes(fixture.status)
   );
-  const preferredTeamMatches = preferredTeam
-    ? fixtures
-        .filter(
-          ({ homeTeam, awayTeam }) =>
-            homeTeam === preferredTeam.name ||
-            awayTeam === preferredTeam.name ||
-            homeTeam === preferredTeam.shortName ||
-            awayTeam === preferredTeam.shortName
-        )
-        .sort((a, b) => new Date(a.utcDate) - new Date(b.utcDate))
-    : [];
   const upcomingStatuses = ["SCHEDULED", "TIMED"];
   const upcomingMatches = fixtures
     .filter((fixture) => upcomingStatuses.includes(fixture.status))
@@ -164,22 +154,15 @@ export default function Home({ fixtures }) {
           matches={liveMatches}
           emptyMessage="No live matches right now."
         />
-        {preferredTeam && (
-          <MatchSection
-            title={`Favourite Team: ${preferredTeam.name}`}
-            matches={preferredTeamMatches}
-            emptyMessage={`No matches available for ${preferredTeam.name}.`}
-          />
-        )}
-        <MatchSection
-          title="Upcoming Matches"
-          matches={upcomingMatches}
-          emptyMessage="No upcoming matches right now."
-        />
         <MatchSection
           title="Recent Results"
           matches={recentResults}
           emptyMessage="No recent results yet."
+        />
+        <MatchSection
+          title="Upcoming Matches"
+          matches={upcomingMatches}
+          emptyMessage="No upcoming matches right now."
         />
       </main>
 
